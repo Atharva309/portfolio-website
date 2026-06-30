@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Projects | Atharva Patil</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="overflow: hidden;">
+    <nav class="navbar scrolled">
+        <div class="logo"><a href="index.html" style="color:inherit; text-decoration:none;">Atharva<span>.</span></a></div>
+        <ul class="nav-links">
+            <li class="dropdown">
+                <a href="index.html#about" class="dropbtn">About <i class="fas fa-chevron-down" style="font-size: 0.8em; margin-left: 4px;"></i></a>
+                <div class="dropdown-content">
+                    <a href="index.html#experience">Experience</a>
+                    <a href="index.html#skills">Skills</a>
+                    <a href="index.html#contact">Contact</a>
+                </div>
+            </li>
+            <li><a href="projects.html" class="highlight">Projects</a></li>
+        </ul>
+    </nav>
+
+    <section id="constellation-section" style="position: relative; width: 100vw; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--bg-dark);">
+        <!-- Container has pointer-events: none so it doesn't block canvas hovers -->
+        <div class="container" style="position: absolute; top: 120px; left: 0; width: 100%; z-index: 10; text-align: center; pointer-events: none;">
+            <h2 class="section-title reveal" style="margin-bottom: 0.5rem; justify-content: center;">Project Universe</h2>
+            
+            <div class="projects-filter reveal" style="margin-top: 1rem; margin-bottom: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; pointer-events: auto;">
+                <button class="filter-btn active" data-filter="all" style="padding: 0.5rem 1rem; border-radius: 20px; background: var(--primary); border: none; color: white; cursor: pointer; font-family: 'Inter'; font-weight: 600;">All</button>
+                <button class="filter-btn" data-filter="AI/ML" style="padding: 0.5rem 1rem; border-radius: 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-muted); cursor: pointer; font-family: 'Inter'; font-weight: 500;">AI/ML</button>
+                <button class="filter-btn" data-filter="Data Analytics" style="padding: 0.5rem 1rem; border-radius: 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-muted); cursor: pointer; font-family: 'Inter'; font-weight: 500;">Data Analytics</button>
+                <button class="filter-btn" data-filter="Cloud/Full-Stack" style="padding: 0.5rem 1rem; border-radius: 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-muted); cursor: pointer; font-family: 'Inter'; font-weight: 500;">Cloud/Full-Stack</button>
+            </div>
+        </div>
+
+        <canvas id="constellationCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair;"></canvas>
+        
+        <div id="star-tooltip" style="position: absolute; opacity: 0; pointer-events: none; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px); border: 1px solid var(--primary); padding: 1rem; border-radius: 8px; color: white; transition: opacity 0.2s; z-index: 20; transform: translate(-50%, -120%); box-shadow: 0 0 20px rgba(108, 99, 255, 0.3);">
+            <h3 id="tooltip-title" style="margin-bottom: 0.25rem; font-family: 'Outfit';">Project Title</h3>
+            <span id="tooltip-category" style="font-size: 0.8rem; color: var(--secondary);">Category</span>
+        </div>
+    </section>
+
+    <script src="data.js"></script>
+    <script src="constellation.js"></script>
+    <script src="projects.js"></script>
+</body>
+</html>

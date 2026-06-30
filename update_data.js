@@ -1,0 +1,211 @@
+const fs = require('fs');
+
+// The original projectsData string will be replaced by this cleaner version.
+const newData = `const projectsData = [
+    {
+        id: "meridian",
+        title: "Meridian (MMM Platform)",
+        category: "AI/ML",
+        shortDescription: "Marketing Mix Modeling platform with budget optimization and an LLM-powered analyst interface.",
+        fullDescription: "<p>Meridian is a complete end-to-end <strong>Marketing Mix Modeling (MMM)</strong> workspace. It allows stakeholders to upload marketing and outcome data, configure channel mapping, and run budget optimization algorithms.</p><h3>Key Features</h3><ul><li>Implements geometric adstock decay, Hill saturation functions, and OLS/Ridge regression to decompose revenue into channel contributions.</li><li>Budget optimizer using SciPy SLSQP constrained optimization that recommends optimal channel allocation under diminishing returns.</li><li><strong>Meridian AI:</strong> Built an LLM-powered analyst interface using OpenAI function calling with grounded tool handlers, ensuring all responses cite real model outputs with zero hallucination.</li></ul>",
+        techStack: ["React", "TypeScript", "FastAPI", "Scikit-learn", "SciPy", "OpenAI API", "Docker"],
+        githubUrl: "https://github.com/Atharva309/Meridian",
+        liveUrl: "https://meridian-26kiwy8sz-atharva309s-projects.vercel.app/",
+        imageUrl: "", 
+        icon: "fas fa-robot"
+    },
+    {
+        id: "jobpilot",
+        title: "JobPilot",
+        category: "AI/ML",
+        shortDescription: "Automated, AI-powered job hunter dashboard using Claude 3.5 Sonnet to semantically match job postings.",
+        fullDescription: "<p>A fully automated, AI-powered web dashboard designed to help job seekers bypass manual job board hunting.</p><h3>How It Works</h3><ul><li>Automatically scrapes company career pages using BeautifulSoup4.</li><li>Filters postings matching a precise candidate profile using <strong>Anthropic's Claude 3.5 API</strong>.</li><li>Manages applications in a sleek, centralized dashboard backed by Neon PostgreSQL.</li></ul>",
+        techStack: ["Claude 3.5 Sonnet", "FastAPI", "PostgreSQL", "BeautifulSoup4", "Render"],
+        githubUrl: "https://github.com/Atharva309/JobPilot",
+        liveUrl: "https://job-hunter-dashboard-kf6x.onrender.com",
+        imageUrl: "", 
+        icon: "fas fa-briefcase"
+    },
+    {
+        id: "privacy-guard",
+        title: "Privacy-Guard",
+        category: "AI/ML",
+        shortDescription: "AI-powered PHI redaction for clinical documents using context-aware detection for healthcare compliance.",
+        fullDescription: "<p>Privacy Guard automatically detects and redacts <strong>Protected Health Information (PHI)</strong> from clinical documents like discharge summaries, lab reports, and insurance claims.</p><h3>Core Technology</h3><ul><li>Uses <strong>Apple Vision Neural Engine (M-Series)</strong> for precise OCR text extraction.</li><li>Two-stage GPT-4o-mini pipeline to identify global context and distinguish patient PHI from physician info, facility data, and clinical codes.</li><li>Features a tri-tier visual redaction engine using PyMuPDF for pixel-perfect placement.</li></ul>",
+        techStack: ["GPT-4o-mini", "Apple Vision", "Streamlit", "PyMuPDF", "Python"],
+        githubUrl: "https://github.com/Atharva309/Privacy-Guard",
+        liveUrl: "",
+        imageUrl: "https://raw.githubusercontent.com/Atharva309/Privacy-Guard/main/assets/ui_overview.png",
+        icon: "fas fa-shield-alt"
+    },
+    {
+        id: "xai-diabetes",
+        title: "Explainable AI in Diabetes",
+        category: "AI/ML",
+        shortDescription: "Deep learning models for diabetes prediction utilizing SHAP, LIME, and ALE for full interpretability.",
+        fullDescription: "<p>Explores diabetes prediction using various ML models and XAI techniques on the Pima Indian Diabetes dataset. Because AI should be transparent, not a black box.</p><ul><li>Built and compared deep learning models (CNN, RNN, MLP).</li><li>Applied state-of-the-art explainability methods including SHAP, LIME, and ALE.</li><li>Focused on transparency, bias awareness, and responsible healthcare AI, culminating in a research paper.</li></ul>",
+        techStack: ["Python", "PyTorch", "SHAP", "LIME", "CNN", "RNN"],
+        githubUrl: "https://github.com/Atharva309/XAI_diabetes",
+        liveUrl: "",
+        imageUrl: "",
+        icon: "fas fa-heartbeat"
+    },
+    {
+        id: "bob-ross-gan",
+        title: "Bob Ross Painting GAN",
+        category: "AI/ML",
+        shortDescription: "Trained a Generative Adversarial Network (GAN) to generate landscape paintings in the style of Bob Ross.",
+        fullDescription: "<p>We don\\'t make mistakes, just happy little accidents. — This project utilizes Pix2Pix and image translation architectures to synthesize completely new landscape paintings based on Bob Ross\\'s iconic style.</p>",
+        techStack: ["GAN", "Pix2Pix", "PyTorch", "Computer Vision"],
+        githubUrl: "https://github.com/Atharva309/BobRoss_Painting_Generator",
+        liveUrl: "",
+        imageUrl: "",
+        icon: "fas fa-paint-brush"
+    },
+    {
+        id: "waste-classification",
+        title: "Waste Classification AI",
+        category: "AI/ML",
+        shortDescription: "Classification of waste using image analysis (YOLO, ResNet, MobileNet).",
+        fullDescription: "<p>An environmental AI project utilizing transfer learning across multiple architectures (YOLO, ResNet, MobileNet) for automated trash sorting.</p>",
+        techStack: ["YOLO", "ResNet", "MobileNet", "Computer Vision"],
+        githubUrl: "https://github.com/Atharva309/Waste_Classification",
+        liveUrl: "",
+        imageUrl: "",
+        icon: "fas fa-trash-alt"
+    },
+    {
+        id: "drowsiness-detection",
+        title: "Driver Drowsiness Detection",
+        category: "AI/ML",
+        shortDescription: "Detect drowsiness in drivers through eyes and yawns using YOLOv5.",
+        fullDescription: "<p>Real-time computer vision system tracking facial landmarks and yawns to alert drivers and prevent accidents.</p>",
+        techStack: ["YOLOv5", "Computer Vision", "OpenCV"],
+        githubUrl: "https://github.com/Atharva309/Drowsiness_detection_driving",
+        liveUrl: "",
+        imageUrl: "",
+        icon: "fas fa-eye-slash"
+    },
+    {
+        id: "sudoku-solver",
+        title: "Sudoku Solver (Genetic Algorithm)",
+        category: "AI/ML",
+        shortDescription: "Solving Sudoku puzzles using Evolutionary / Genetic Algorithms.",
+        fullDescription: "<p>An AI project implementing genetic algorithms with selection, crossover, and mutation to solve complex Sudoku puzzles iteratively.</p>",
+        techStack: ["Python", "Genetic Algorithm", "AI"],
+        githubUrl: "https://github.com/Atharva309/SudokuSolver",
+        liveUrl: "",
+        imageUrl: "",
+        icon: "fas fa-chess-board"
+    },
+    {
+        id: "info-carsales",
+        title: "INFO-CarSales",
+        category: "Data Analytics",
+        shortDescription: "Highly interactive vehicle sales dashboard tracking market shifts and dominant brands.",
+        fullDescription: "<p>A highly interactive, production-ready Streamlit dashboard designed to contextualize and track market shifts, dominant car brands, and core depreciation mechanics.</p><h3>Features</h3><ul><li>Dynamic Sidebar Filters: Chain-filtering algorithms automatically sync context across parameters.</li><li>Top KPI Tracking: Real-time aggregation of Total Sales, Average Price, and Dominant Form factors.</li><li>Dynamic Business Insights: Raw logic dynamically builds semantic, business-oriented insights depending on filters.</li></ul>",
+        techStack: ["Streamlit", "Python", "Data Visualization"],
+        githubUrl: "https://github.com/Atharva309/INFO-CarSales",
+        liveUrl: "https://info-carsales-5n9dcu4q94har2hqqbwrye.streamlit.app/",
+        imageUrl: "",
+        icon: "fas fa-car"
+    },
+    {
+        id: "dashboard-architect",
+        title: "Dashboard Architect",
+        category: "Data Analytics",
+        shortDescription: "Full-stack sales analytics system featuring cursor-based SQL stored procedures and threshold alerts.",
+        fullDescription: "<p>Small-company sales schema with a cursor-based stored procedure, an AFTER INSERT trigger on sales that keeps the monthly summary up to date, and a Flask web app for KPIs, analytics, and threshold alerts.</p><ul><li>Allows users to import custom CSV datasets dynamically.</li><li>Features deep PostgreSQL integration utilizing triggers and server-side aggregations.</li><li>Deployed live via Render with fully functioning database routing.</li></ul>",
+        techStack: ["Flask", "PostgreSQL", "Python", "SQL"],
+        githubUrl: "https://github.com/Atharva309/Dashboard-Architect",
+        liveUrl: "https://dashboard-architect.onrender.com/#database",
+        imageUrl: "",
+        icon: "fas fa-chart-bar"
+    },
+    {
+        id: "asteroid-analysis",
+        title: "Asteroid Analysis",
+        category: "Data Analytics",
+        shortDescription: "Performing Asteroid data analysis using postgresql, liquibase, and R.",
+        fullDescription: "<p>Comprehensive statistical analysis of asteroid data using R and Naive Bayes Classifiers, managed with Liquibase and PostgreSQL.</p>",
+        techStack: ["R", "PostgreSQL", "Liquibase", "Naive Bayes"],
+        githubUrl: "https://github.com/Atharva309/Asteroid-Analysis",
+        liveUrl: "",
+        imageUrl: "",
+        icon: "fas fa-meteor"
+    },
+    {
+        id: "fifa-dashboard",
+        title: "FIFA Player Dashboard",
+        category: "Data Analytics",
+        shortDescription: "Interactive FIFA player analytics dashboard built in PowerBI and Tableau.",
+        fullDescription: "<p>Extensive visualization of player stats, market values, and attribute distributions using advanced DAX queries and interactive Tableau interfaces.</p>",
+        techStack: ["PowerBI", "DAX", "Tableau", "Data Visualization"],
+        githubUrl: "https://github.com/Atharva309/FIFA_DASHBOARD",
+        liveUrl: "https://app.powerbi.com/view?r=eyJrIjoiZWE0OTg0MDAtNzQzYi00ZjgzLWE3N2EtMzMxNDAyM2U2Y2Q1IiwidCI6ImQxZjE0MzQ4LWYxYjUtNGEwOS1hYzk5LTdlYmYyMTNjYmM4MSIsImMiOjEwfQ%3D%3D",
+        imageUrl: "",
+        icon: "fas fa-futbol"
+    },
+    {
+        id: "car-sales-powerbi",
+        title: "Car Sales Dashboard (PowerBI)",
+        category: "Data Analytics",
+        shortDescription: "Advanced and Interactive Dashboard for Car Sales using PowerBI.",
+        fullDescription: "<p>Business intelligence dashboard leveraging DAX and interactive visualizations to track sales performance, revenue, and dealership metrics.</p>",
+        techStack: ["PowerBI", "DAX Query", "Data Visualization"],
+        githubUrl: "https://github.com/Atharva309/Car-Sales-Dashboard-PowerBI",
+        liveUrl: "",
+        imageUrl: "",
+        icon: "fas fa-car-side"
+    },
+    {
+        id: "cloudsense",
+        title: "CloudSense",
+        category: "Cloud/Full-Stack",
+        shortDescription: "Serverless AI-powered code review platform analyzing GitHub commits using AWS Lambda pipelines.",
+        fullDescription: "<p>Built a serverless AI-powered code review platform that automatically analyzes GitHub commits using webhook-triggered AWS Lambda pipelines and GPT-based review generation.</p><ul><li>Designed event-driven AWS cloud architecture with API Gateway, SQS, and Lambda workers to process 1,000+ commit events asynchronously.</li><li>Integrated GPT-4o-mini with FastAPI and PostgreSQL to generate structured code-quality findings, security insights, and review histories.</li><li>Deployed full-stack infrastructure on AWS with JWT-secured APIs, VPC-connected RDS, and S3-hosted frontend delivery.</li></ul>",
+        techStack: ["AWS Lambda", "API Gateway", "SQS", "RDS", "FastAPI", "OpenAI"],
+        githubUrl: "https://github.com/Atharva309/CloudSense",
+        liveUrl: "",
+        imageUrl: "",
+        icon: "fas fa-cloud"
+    },
+    {
+        id: "agentsquared",
+        title: "AgentSquared",
+        category: "Cloud/Full-Stack",
+        shortDescription: "No-code AI agent platform enabling small businesses to create production-ready support and social agents.",
+        fullDescription: "<p>Built and deployed a no-code AI agent platform at HackCU 2026 enabling small businesses to create production-ready support and social agents from website URLs or uploaded documents in under 60 seconds.</p><ul><li>Engineered a FastAPI + SQLAlchemy backend with RAG-based knowledge ingestion and asynchronous website crawling.</li><li>Implemented multi-agent workflows including customer support chat, social sentiment monitoring, and autonomous brand posting.</li><li>Deployed end-to-end on Vultr using Nginx, PM2, and Ubuntu.</li></ul>",
+        techStack: ["FastAPI", "Gemini API", "Next.js", "RAG", "Vultr", "SQLite"],
+        githubUrl: "https://github.com/Atharva309/AgentSquared",
+        liveUrl: "",
+        imageUrl: "",
+        icon: "fas fa-project-diagram"
+    },
+    {
+        id: "airline-flutter",
+        title: "Airline Reservation App",
+        category: "Cloud/Full-Stack",
+        shortDescription: "A cross-platform Flutter app for airline reservations.",
+        fullDescription: "<p>Mobile application development utilizing Dart and Flutter for seamless UI/UX and reservation logic.</p>",
+        techStack: ["Flutter", "Dart", "Android Studio"],
+        githubUrl: "https://github.com/Atharva309/AirlineReservation_FlutterApp",
+        liveUrl: "",
+        imageUrl: "",
+        icon: "fas fa-plane"
+    },
+    {
+        id: "airline-web",
+        title: "Airline Reservation Web",
+        category: "Cloud/Full-Stack",
+        shortDescription: "Frontend website for airline reservations.",
+        fullDescription: "<p>Responsive web interfaces built with HTML, CSS, and Vanilla JavaScript.</p>",
+        techStack: ["HTML", "CSS", "JavaScript"],
+        githubUrl: "https://github.com/Atharva309/airline_reservation_WebPage",
+        liveUrl: "",
+        imageUrl: "",
+        icon: "fas fa-globe"
+    }
+];
+`;
+fs.writeFileSync('/Users/sachin/.gemini/antigravity/scratch/Atharva-Portfolio/data.js', newData);
