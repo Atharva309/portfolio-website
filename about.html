@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atharva Patil | Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Atharva<span>.</span></div>
+        <ul class="nav-links">
+            <li class="dropdown">
+                <a href="index.html#about" class="dropbtn">About <i class="fas fa-chevron-down" style="font-size: 0.8em; margin-left: 4px;"></i></a>
+                <div class="dropdown-content">
+                    <a href="about.html#experience">Experience</a>
+                    <a href="about.html#skills">Skills</a>
+                    <a href="index.html#contact">Contact</a>
+                </div>
+            </li>
+            <li><a href="index.html">Projects</a></li>
+        </ul>
+        <div class="hamburger">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
+
+    <header class="hero" id="home">
+        <div class="hero-content reveal">
+            <h1>Hi, I'm <span class="highlight">Atharva Patil</span></h1>
+            <h2><span id="typing-text"></span><span class="cursor">|</span></h2>
+            <p>Passionate about building intelligent systems that solve real-world problems — from generative AI to computer vision and scalable data systems.</p>
+            <div class="social-links">
+                <a href="https://github.com/Atharva309" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/atharva-patil-714b77222/" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                <a href="mailto:aspatil0910@gmail.com"><i class="fas fa-envelope"></i></a>
+            </div>
+            <a href="index.html" class="btn-secondary">View My Projects <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </header>
+
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2 class="section-title reveal">About Me</h2>
+            <div class="about-grid reveal">
+                <div class="about-text">
+                    <p>I am an AI Specialist and Machine Learning Engineer currently pursuing my MS in Data Science at the University of Colorado Boulder. I specialize in building end-to-end intelligent systems, ranging from RAG pipelines and LLM-powered agents to scalable cloud infrastructure.</p>
+                    <div class="contact-info">
+                        <p><i class="fas fa-map-marker-alt"></i> Boulder, Colorado, USA</p>
+                        <p><i class="fas fa-envelope"></i> atpa5127@colorado.edu</p>
+                    </div>
+                </div>
+                <div class="education-cards">
+                    <div class="glass-card education-card">
+                        <i class="fas fa-graduation-cap edu-icon"></i>
+                        <h3>MS Data Science</h3>
+                        <p class="institution">University of Colorado Boulder</p>
+                        <p class="date">Expected May 2026</p>
+                        <span class="gpa">GPA: 3.9/4.0</span>
+                    </div>
+                    <div class="glass-card education-card">
+                        <i class="fas fa-university edu-icon"></i>
+                        <h3>BTech Information Technology</h3>
+                        <p class="institution">University of Mumbai (DJSCE)</p>
+                        <p class="date">Graduated May 2024</p>
+                        <p class="minor">Minor: Data Science</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience" class="experience-section">
+        <div class="container">
+            <h2 class="section-title reveal">Experience</h2>
+            <div class="timeline">
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot"></div>
+                    <div class="glass-card timeline-content">
+                        <h3>AI Specialist Intern</h3>
+                        <h4>Projxon</h4>
+                        <span class="date">Aug 2025 - May 2026</span>
+                        <ul>
+                            <li>Co-designed <strong>OrcaAI</strong>, a cloud-oriented business optimization consultant leveraging AWS, predictive analytics, and recommendation logic. Secured 2nd place and $25K AWS credits.</li>
+                            <li>Built an automated ETL pipeline from LinkedIn and Windsor.ai into BigQuery and Looker Studio using SQL and Association Rule Mining.</li>
+                            <li>Designed conversational HR support logic using the Gemini API.</li>
+                        </ul>
+                        <div class="tech-stack">
+                            <span>AWS</span><span>GCP</span><span>Gemini API</span><span>BigQuery</span><span>SQL</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot"></div>
+                    <div class="glass-card timeline-content">
+                        <h3>AI/ML Engineer Intern</h3>
+                        <h4>Exaplus Technologies</h4>
+                        <span class="date">Dec 2023 – Jul 2024</span>
+                        <ul>
+                            <li>Built an automated document intelligence pipeline using OpenAI API/GPT and FastAPI to extract structured JSON from unstructured client documents, replacing manual review.</li>
+                            <li>Developed an automated financial reconciliation system with Pandas and NLP logic for anomaly detection.</li>
+                            <li>Designed an end-to-end hyper-automation pipeline using K-Means clustering to segment clients by transaction behavior.</li>
+                        </ul>
+                        <div class="tech-stack">
+                            <span>OpenAI API</span><span>FastAPI</span><span>Scikit-learn</span><span>Pandas</span><span>NLP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot"></div>
+                    <div class="glass-card timeline-content">
+                        <h3>Machine Learning Engineer Intern</h3>
+                        <h4>E4 Software Services</h4>
+                        <span class="date">Sept 2023 - Oct 2023</span>
+                        <ul>
+                            <li>Built an end-to-end resume parsing system using SpaCy NER and custom NLP pipelines to extract structured entities.</li>
+                            <li>Developed an enterprise document parsing pipeline using Tesseract OCR, Canny Edge Detection, and SpaCy.</li>
+                        </ul>
+                        <div class="tech-stack">
+                            <span>Python</span><span>SpaCy</span><span>OCR</span><span>NER</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="projects-preview" style="text-align: center; padding: 4rem 0;">
+        <div class="container reveal">
+            <h2 class="section-title" style="justify-content: center; margin-bottom: 1.5rem;">My Projects</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2.5rem; max-width: 600px; margin-inline: auto;">Explore my full interactive constellation of AI, Data Analytics, and Cloud engineering projects.</p>
+            <a href="index.html" class="btn-primary">Explore Project Universe <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </section>
+
+    <section id="skills" class="skills-section">
+        <div class="container">
+            <h2 class="section-title reveal">Technical Skills</h2>
+            <div class="skills-grid reveal">
+                <div class="glass-card skill-category">
+                    <i class="fas fa-brain skill-icon"></i>
+                    <h3>Machine Learning & AI</h3>
+                    <div class="tech-stack wrap">
+                        <span>Deep Learning</span><span>CNN/RNN</span><span>NLP</span><span>Computer Vision</span><span>LLMs</span><span>RAG</span><span>Gradient Boosting</span><span>SHAP/LIME</span><span>Marketing Mix Modeling</span>
+                    </div>
+                </div>
+                
+                <div class="glass-card skill-category">
+                    <i class="fas fa-code skill-icon"></i>
+                    <h3>Programming</h3>
+                    <div class="tech-stack wrap">
+                        <span>Python</span><span>R</span><span>SQL</span><span>JavaScript</span><span>Dart</span><span>Flutter</span>
+                    </div>
+                </div>
+
+                <div class="glass-card skill-category">
+                    <i class="fas fa-cloud skill-icon"></i>
+                    <h3>Cloud & Backend</h3>
+                    <div class="tech-stack wrap">
+                        <span>AWS (Lambda, SQS, RDS)</span><span>GCP</span><span>BigQuery</span><span>FastAPI</span><span>REST APIs</span><span>Docker</span>
+                    </div>
+                </div>
+
+                <div class="glass-card skill-category">
+                    <i class="fas fa-chart-pie skill-icon"></i>
+                    <h3>Data & Visualization</h3>
+                    <div class="tech-stack wrap">
+                        <span>PostgreSQL</span><span>MySQL</span><span>Power BI</span><span>DAX</span><span>Tableau</span><span>Looker Studio</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact-section">
+        <div class="container reveal">
+            <div class="glass-card contact-card">
+                <h2>Let's build something incredible.</h2>
+                <p>I'm currently open to new opportunities. Whether you have a question, a project idea, or just want to say hi, I'll try my best to get back to you!</p>
+                <div class="contact-buttons">
+                    <a href="mailto:aspatil0910@gmail.com" class="btn-primary">Say Hello <i class="fas fa-paper-plane"></i></a>
+                    <a href="https://github.com/Atharva309" target="_blank" class="btn-secondary"><i class="fab fa-github"></i> GitHub</a>
+                    <a href="https://www.linkedin.com/in/atharva-patil-714b77222/" target="_blank" class="btn-secondary"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>Designed & Built by Atharva Patil</p>
+        </div>
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+    <script src="constellation.js"></script>
+</body>
+</html>

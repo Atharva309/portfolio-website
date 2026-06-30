@@ -44,6 +44,108 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.closePath();
     }
 
+    function drawPlanet(ctx, x, y, radius) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(Math.PI / 6); // tilt
+        
+        // Planet body
+        let gradient = ctx.createLinearGradient(-radius, -radius, radius, radius);
+        gradient.addColorStop(0, 'rgba(75, 0, 130, 0.4)'); // Deep purple transparent
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Ring
+        ctx.beginPath();
+        ctx.ellipse(0, 0, radius * 2.2, radius * 0.4, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(150, 140, 255, 0.2)';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        
+        ctx.restore();
+    }
+
+    const spaceObjects = [];
+    
+    function spawnSpaceObject() {
+        if (Math.random() > 0.98 && spaceObjects.length < 5) {
+            const isRocket = Math.random() > 0.5;
+            const x = Math.random() > 0.5 ? -50 : width + 50;
+            const y = Math.random() * height;
+            const targetX = width / 2 + (Math.random() - 0.5) * width;
+            const targetY = height / 2 + (Math.random() - 0.5) * height;
+            
+            const angle = Math.atan2(targetY - y, targetX - x);
+            const speed = isRocket ? 3 + Math.random() * 2 : 0.5 + Math.random();
+            
+            spaceObjects.push({
+                x, y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                angle,
+                isRocket,
+                rotation: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.1
+            });
+        }
+    }
+
+    function drawSpaceObjects(ctx) {
+        for (let i = spaceObjects.length - 1; i >= 0; i--) {
+            const obj = spaceObjects[i];
+            obj.x += obj.vx;
+            obj.y += obj.vy;
+            obj.rotation += obj.rotSpeed;
+            
+            ctx.save();
+            ctx.translate(obj.x, obj.y);
+            
+            if (obj.isRocket) {
+                ctx.rotate(obj.angle);
+                // Draw tiny rocket
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.beginPath();
+                ctx.moveTo(10, 0);
+                ctx.lineTo(-5, 4);
+                ctx.lineTo(-5, -4);
+                ctx.closePath();
+                ctx.fill();
+                // Exhaust
+                ctx.fillStyle = 'rgba(255, 111, 0, 0.8)';
+                ctx.beginPath();
+                ctx.moveTo(-5, 2);
+                ctx.lineTo(-12 - Math.random()*5, 0);
+                ctx.lineTo(-5, -2);
+                ctx.closePath();
+                ctx.fill();
+            } else {
+                ctx.rotate(obj.rotation);
+                // Draw asteroid
+                ctx.fillStyle = 'rgba(136, 136, 136, 0.5)';
+                ctx.beginPath();
+                ctx.moveTo(6, 0);
+                ctx.lineTo(4, 5);
+                ctx.lineTo(-2, 6);
+                ctx.lineTo(-5, 3);
+                ctx.lineTo(-6, -2);
+                ctx.lineTo(-2, -5);
+                ctx.lineTo(5, -4);
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            ctx.restore();
+            
+            // Remove if off screen
+            if (obj.x < -100 || obj.x > width + 100 || obj.y < -100 || obj.y > height + 100) {
+                spaceObjects.splice(i, 1);
+            }
+        }
+    }
+
     // Data parsing
     const categories = {};
     if (typeof projectsData !== 'undefined') {
@@ -115,9 +217,10 @@ document.addEventListener('DOMContentLoaded', () => {
         bgStars.push({
             x: Math.random() * width,
             y: Math.random() * height,
-            radius: Math.random() * 1.5,
+            radius: Math.random() * 1.5 + 0.5,
             vx: (Math.random() - 0.5) * 0.05,
-            vy: (Math.random() - 0.5) * 0.05
+            vy: (Math.random() - 0.5) * 0.05,
+            twinkleOffset: Math.random() * Math.PI * 2
         });
     }
 
@@ -148,8 +251,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function draw() {
         ctx.clearRect(0, 0, width, height);
 
-        // Draw background stars
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        const time = Date.now() * 0.002;
+
+        // Draw planet in the background
+        drawPlanet(ctx, width * 0.8, height * 0.2, 100);
+
+        // Draw background stars with shimmer
         bgStars.forEach(s => {
             s.x += s.vx;
             s.y += s.vy;
@@ -158,14 +265,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (s.y < 0) s.y = height;
             if (s.y > height) s.y = 0;
 
+            const twinkle = Math.sin(time + s.twinkleOffset) * 0.5 + 0.5; // 0.0 to 1.0
+            ctx.fillStyle = `rgba(255, 255, 255, ${twinkle * 0.8})`; // Max opacity 0.8
             ctx.beginPath();
             ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
             ctx.fill();
         });
 
+        // Spawn and draw space objects
+        spawnSpaceObject();
+        drawSpaceObjects(ctx);
+
         // Update main stars
         let currentHover = null;
-        const time = Date.now() * 0.002;
 
         constellations.forEach(star => {
             // Stars are stationary as requested
