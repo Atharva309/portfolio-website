@@ -266,9 +266,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const nTime = timeMs * 0.0001;
         
         const nebulas = [
-            { x: width * 0.3 + Math.sin(nTime) * 100, y: height * 0.3 + Math.cos(nTime) * 100, r: Math.max(width, height) * 0.5, color: 'rgba(75, 0, 130, 0.15)' }, // Purple
-            { x: width * 0.7 + Math.cos(nTime * 0.8) * 100, y: height * 0.7 + Math.sin(nTime * 0.8) * 100, r: Math.max(width, height) * 0.5, color: 'rgba(0, 191, 255, 0.1)' }, // Blue
-            { x: width * 0.5 + Math.sin(nTime * 1.2) * 50, y: height * 0.5 + Math.cos(nTime * 1.2) * 50, r: Math.max(width, height) * 0.6, color: 'rgba(255, 20, 147, 0.05)' }  // Pink
+            // Deep cosmic purple core
+            { x: width * 0.4 + Math.sin(nTime) * 150, y: height * 0.4 + Math.cos(nTime) * 100, r: Math.max(width, height) * 0.6, color: 'rgba(90, 20, 150, 0.45)' },
+            // Bright cyan/blue gas clouds
+            { x: width * 0.7 + Math.cos(nTime * 0.8) * 200, y: height * 0.6 + Math.sin(nTime * 0.8) * 150, r: Math.max(width, height) * 0.55, color: 'rgba(0, 220, 255, 0.35)' },
+            // Vibrant pink/magenta stardust clusters
+            { x: width * 0.2 + Math.sin(nTime * 1.2) * 100, y: height * 0.7 + Math.cos(nTime * 1.2) * 200, r: Math.max(width, height) * 0.65, color: 'rgba(255, 20, 147, 0.3)' },
+            // Center fusion glow
+            { x: width * 0.5 + Math.cos(nTime * 0.5) * 50, y: height * 0.5 + Math.sin(nTime * 0.5) * 50, r: Math.max(width, height) * 0.4, color: 'rgba(138, 43, 226, 0.25)' }
         ];
 
         nebulas.forEach(n => {
