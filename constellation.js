@@ -258,36 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function draw() {
         ctx.clearRect(0, 0, width, height);
 
-        // Draw Nebula/Stardust effect
-        ctx.globalCompositeOperation = 'screen';
-        
-        // Dynamic nebula positions based on time
         const timeMs = Date.now();
-        const nTime = timeMs * 0.0001;
-        
-        const nebulas = [
-            // Deep cosmic purple core
-            { x: width * 0.4 + Math.sin(nTime) * 150, y: height * 0.4 + Math.cos(nTime) * 100, r: Math.max(width, height) * 0.6, color: 'rgba(90, 20, 150, 0.45)' },
-            // Bright cyan/blue gas clouds
-            { x: width * 0.7 + Math.cos(nTime * 0.8) * 200, y: height * 0.6 + Math.sin(nTime * 0.8) * 150, r: Math.max(width, height) * 0.55, color: 'rgba(0, 220, 255, 0.35)' },
-            // Vibrant pink/magenta stardust clusters
-            { x: width * 0.2 + Math.sin(nTime * 1.2) * 100, y: height * 0.7 + Math.cos(nTime * 1.2) * 200, r: Math.max(width, height) * 0.65, color: 'rgba(255, 20, 147, 0.3)' },
-            // Center fusion glow
-            { x: width * 0.5 + Math.cos(nTime * 0.5) * 50, y: height * 0.5 + Math.sin(nTime * 0.5) * 50, r: Math.max(width, height) * 0.4, color: 'rgba(138, 43, 226, 0.25)' }
-        ];
-
-        nebulas.forEach(n => {
-            let grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
-            grad.addColorStop(0, n.color);
-            grad.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-            ctx.fill();
-        });
-        
-        ctx.globalCompositeOperation = 'source-over';
-
         const time = timeMs * 0.002;
 
         // Draw planet in the background
