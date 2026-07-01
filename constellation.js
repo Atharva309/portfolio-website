@@ -208,16 +208,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let isWarping = false;
     let warpSpeed = 0;
 
-    // Reset warp state if loaded from bfcache
+    // Force reload if loaded from bfcache
     window.addEventListener('pageshow', (e) => {
-        if (e.persisted || isWarping) {
-            isWarping = false;
-            warpSpeed = 0;
-            document.body.style.pointerEvents = 'auto';
-            constellations.forEach(star => {
-                star.anchorX = star.originalAnchorX;
-                star.anchorY = star.originalAnchorY;
-            });
+        if (e.persisted) {
+            window.location.reload();
         }
     });
 
@@ -246,14 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
             tooltip.style.opacity = '0';
             const targetUrl = `project.html?id=${hoveredStar.project.id}`;
             setTimeout(() => {
-                // Reset state so that back button (bfcache) doesn't load a frozen screen
-                isWarping = false;
-                warpSpeed = 0;
-                document.body.style.pointerEvents = 'auto';
-                constellations.forEach(star => {
-                    star.anchorX = star.originalAnchorX;
-                    star.anchorY = star.originalAnchorY;
-                });
                 window.location.assign(targetUrl);
             }, 600);
         }
