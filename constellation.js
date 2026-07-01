@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const tooltip = document.getElementById('star-tooltip');
     const tooltipTitle = document.getElementById('tooltip-title');
     const tooltipCategory = document.getElementById('tooltip-category');
+    const tooltipImage = document.getElementById('tooltip-image');
+    const tooltipDesc = document.getElementById('tooltip-desc');
 
     function resize() {
         width = window.innerWidth;
@@ -68,81 +70,44 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.restore();
     }
 
-    const spaceObjects = [];
+    const shootingStars = [];
     
-    function spawnSpaceObject() {
-        if (Math.random() > 0.98 && spaceObjects.length < 5) {
-            const isRocket = Math.random() > 0.5;
-            const x = Math.random() > 0.5 ? -50 : width + 50;
-            const y = Math.random() * height;
-            const targetX = width / 2 + (Math.random() - 0.5) * width;
-            const targetY = height / 2 + (Math.random() - 0.5) * height;
-            
-            const angle = Math.atan2(targetY - y, targetX - x);
-            const speed = isRocket ? 3 + Math.random() * 2 : 0.5 + Math.random();
-            
-            spaceObjects.push({
-                x, y,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                angle,
-                isRocket,
-                rotation: Math.random() * Math.PI * 2,
-                rotSpeed: (Math.random() - 0.5) * 0.1
-            });
+    function spawnShootingStar() {
+        if (Math.random() > 0.97 && shootingStars.length < 3 && !isWarping) {
+            const x = Math.random() * width;
+            const y = Math.random() * (height / 2);
+            const angle = Math.PI / 4 + (Math.random() - 0.5) * 0.2; // Diagonal down-right
+            const speed = 15 + Math.random() * 10;
+            const length = 50 + Math.random() * 100;
+            shootingStars.push({ x, y, angle, speed, length, opacity: 1.0 });
         }
     }
 
-    function drawSpaceObjects(ctx) {
-        for (let i = spaceObjects.length - 1; i >= 0; i--) {
-            const obj = spaceObjects[i];
-            obj.x += obj.vx;
-            obj.y += obj.vy;
-            obj.rotation += obj.rotSpeed;
-            
-            ctx.save();
-            ctx.translate(obj.x, obj.y);
-            
-            if (obj.isRocket) {
-                ctx.rotate(obj.angle);
-                // Draw tiny rocket
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                ctx.beginPath();
-                ctx.moveTo(10, 0);
-                ctx.lineTo(-5, 4);
-                ctx.lineTo(-5, -4);
-                ctx.closePath();
-                ctx.fill();
-                // Exhaust
-                ctx.fillStyle = 'rgba(255, 111, 0, 0.8)';
-                ctx.beginPath();
-                ctx.moveTo(-5, 2);
-                ctx.lineTo(-12 - Math.random()*5, 0);
-                ctx.lineTo(-5, -2);
-                ctx.closePath();
-                ctx.fill();
-            } else {
-                ctx.rotate(obj.rotation);
-                // Draw asteroid
-                ctx.fillStyle = 'rgba(136, 136, 136, 0.5)';
-                ctx.beginPath();
-                ctx.moveTo(6, 0);
-                ctx.lineTo(4, 5);
-                ctx.lineTo(-2, 6);
-                ctx.lineTo(-5, 3);
-                ctx.lineTo(-6, -2);
-                ctx.lineTo(-2, -5);
-                ctx.lineTo(5, -4);
-                ctx.closePath();
-                ctx.fill();
+    function drawShootingStars(ctx) {
+        for (let i = shootingStars.length - 1; i >= 0; i--) {
+            const star = shootingStars[i];
+            star.x += Math.cos(star.angle) * star.speed;
+            star.y += Math.sin(star.angle) * star.speed;
+            star.opacity -= 0.015;
+
+            if (star.opacity <= 0 || star.x > width + 200 || star.y > height + 200) {
+                shootingStars.splice(i, 1);
+                continue;
             }
-            
-            ctx.restore();
-            
-            // Remove if off screen
-            if (obj.x < -100 || obj.x > width + 100 || obj.y < -100 || obj.y > height + 100) {
-                spaceObjects.splice(i, 1);
-            }
+
+            const tailX = star.x - Math.cos(star.angle) * star.length;
+            const tailY = star.y - Math.sin(star.angle) * star.length;
+
+            const grad = ctx.createLinearGradient(star.x, star.y, tailX, tailY);
+            grad.addColorStop(0, `rgba(255, 255, 255, ${star.opacity})`);
+            grad.addColorStop(1, `rgba(255, 255, 255, 0)`);
+
+            ctx.beginPath();
+            ctx.moveTo(star.x, star.y);
+            ctx.lineTo(tailX, tailY);
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 2;
+            ctx.stroke();
         }
     }
 
@@ -234,24 +199,39 @@ document.addEventListener('DOMContentLoaded', () => {
     let mouseX = -1000;
     let mouseY = -1000;
     let hoveredStar = null;
+    let targetParallaxX = 0;
+    let targetParallaxY = 0;
+    let currentParallaxX = 0;
+    let currentParallaxY = 0;
+    let isWarping = false;
+    let warpSpeed = 0;
 
     canvas.addEventListener('mousemove', (e) => {
         const rect = canvas.getBoundingClientRect();
         mouseX = e.clientX - rect.left;
         mouseY = e.clientY - rect.top;
+        targetParallaxX = (mouseX / width) * 2 - 1;
+        targetParallaxY = (mouseY / height) * 2 - 1;
     });
 
     canvas.addEventListener('mouseleave', () => {
         mouseX = -1000;
         mouseY = -1000;
         hoveredStar = null;
+        targetParallaxX = 0;
+        targetParallaxY = 0;
         tooltip.style.opacity = '0';
         canvas.style.cursor = 'crosshair';
     });
 
     canvas.addEventListener('click', () => {
-        if (hoveredStar) {
-            window.location.href = `project.html?id=${hoveredStar.project.id}`;
+        if (hoveredStar && !isWarping) {
+            isWarping = true;
+            document.body.style.pointerEvents = 'none'; // disable clicks during warp
+            tooltip.style.opacity = '0';
+            setTimeout(() => {
+                window.location.href = `project.html?id=${hoveredStar.project.id}`;
+            }, 600);
         }
     });
 
@@ -261,8 +241,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const timeMs = Date.now();
         const time = timeMs * 0.002;
 
+        // Parallax smooth interpolation
+        currentParallaxX += (targetParallaxX - currentParallaxX) * 0.05;
+        currentParallaxY += (targetParallaxY - currentParallaxY) * 0.05;
+
+        if (isWarping) warpSpeed += 1.5;
+
+        // Shift background image
+        const bgSection = document.getElementById('constellation-section');
+        if (bgSection && !isWarping) {
+            bgSection.style.backgroundPosition = `calc(50% + ${currentParallaxX * 15}px) calc(50% + ${currentParallaxY * 15}px)`;
+        }
+
         // Draw planet in the background
-        drawPlanet(ctx, width * 0.8, height * 0.2, 100);
+        drawPlanet(ctx, width * 0.8 + currentParallaxX * 5, height * 0.2 + currentParallaxY * 5, 100);
 
         // Draw background stars with shimmer
         bgStars.forEach(s => {
@@ -272,25 +264,58 @@ document.addEventListener('DOMContentLoaded', () => {
             if (s.x > width) s.x = 0;
             if (s.y < 0) s.y = height;
             if (s.y > height) s.y = 0;
+            
+            let drawX = s.x + currentParallaxX * 15;
+            let drawY = s.y + currentParallaxY * 15;
 
-            const twinkle = Math.sin(time + s.twinkleOffset) * 0.5 + 0.5; // 0.0 to 1.0
-            ctx.fillStyle = `rgba(255, 255, 255, ${twinkle * 0.8})`; // Max opacity 0.8
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-            ctx.fill();
+            if (isWarping) {
+                const dx = drawX - width/2;
+                const dy = drawY - height/2;
+                const angle = Math.atan2(dy, dx);
+                s.x += Math.cos(angle) * warpSpeed;
+                s.y += Math.sin(angle) * warpSpeed;
+                drawX = s.x;
+                drawY = s.y;
+                
+                ctx.beginPath();
+                ctx.moveTo(drawX, drawY);
+                ctx.lineTo(drawX - Math.cos(angle) * warpSpeed * 2, drawY - Math.sin(angle) * warpSpeed * 2);
+                ctx.strokeStyle = `rgba(255, 255, 255, 0.8)`;
+                ctx.lineWidth = s.radius;
+                ctx.stroke();
+            } else {
+                const twinkle = Math.sin(time + s.twinkleOffset) * 0.5 + 0.5; // 0.0 to 1.0
+                ctx.fillStyle = `rgba(255, 255, 255, ${twinkle * 0.8})`; // Max opacity 0.8
+                ctx.beginPath();
+                ctx.arc(drawX, drawY, s.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
         });
 
         // Spawn and draw space objects
-        spawnSpaceObject();
-        drawSpaceObjects(ctx);
+        spawnShootingStar();
+        drawShootingStars(ctx);
 
         // Update main stars
         let currentHover = null;
 
         constellations.forEach(star => {
             // Organic drifting logic
-            star.x = star.anchorX + Math.sin(timeMs * star.driftSpeedX + star.driftOffsetX) * star.driftRadius;
-            star.y = star.anchorY + Math.cos(timeMs * star.driftSpeedY + star.driftOffsetY) * star.driftRadius;
+            let drawX = star.anchorX + Math.sin(timeMs * star.driftSpeedX + star.driftOffsetX) * star.driftRadius + currentParallaxX * 30;
+            let drawY = star.anchorY + Math.cos(timeMs * star.driftSpeedY + star.driftOffsetY) * star.driftRadius + currentParallaxY * 30;
+            
+            if (isWarping) {
+                const dx = drawX - width/2;
+                const dy = drawY - height/2;
+                const angle = Math.atan2(dy, dx);
+                star.anchorX += Math.cos(angle) * warpSpeed * 0.6;
+                star.anchorY += Math.sin(angle) * warpSpeed * 0.6;
+                drawX = star.anchorX;
+                drawY = star.anchorY;
+            }
+            
+            star.x = drawX;
+            star.y = drawY;
             
             // Check hover
             const dx = mouseX - star.x;
@@ -359,8 +384,20 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.shadowBlur = isDimmed ? 0 : 25;
             
             // Draw 4-point star flare
-            drawStarShape(ctx, star.x, star.y, 4, star.currentRadius * 1.5, star.currentRadius * 0.3);
-            ctx.fill();
+            if (isWarping) {
+                const dx = star.x - width/2;
+                const dy = star.y - height/2;
+                const angle = Math.atan2(dy, dx);
+                ctx.beginPath();
+                ctx.moveTo(star.x, star.y);
+                ctx.lineTo(star.x - Math.cos(angle) * warpSpeed * 1.5, star.y - Math.sin(angle) * warpSpeed * 1.5);
+                ctx.strokeStyle = ctx.fillStyle;
+                ctx.lineWidth = star.currentRadius;
+                ctx.stroke();
+            } else {
+                drawStarShape(ctx, star.x, star.y, 4, star.currentRadius * 1.5, star.currentRadius * 0.3);
+                ctx.fill();
+            }
             
             ctx.shadowBlur = 0; // reset
             ctx.globalAlpha = 1.0; // reset
@@ -372,6 +409,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 hoveredStar = currentHover;
                 tooltipTitle.textContent = hoveredStar.project.title;
                 tooltipCategory.textContent = hoveredStar.project.category;
+                if (tooltipDesc) tooltipDesc.innerHTML = hoveredStar.project.shortDescription;
+                
+                if (tooltipImage) {
+                    if (hoveredStar.project.imageUrl) {
+                        tooltipImage.src = hoveredStar.project.imageUrl;
+                        tooltipImage.style.display = 'block';
+                    } else {
+                        tooltipImage.style.display = 'none';
+                    }
+                }
                 tooltip.style.opacity = '1';
                 canvas.style.cursor = 'pointer';
             }
