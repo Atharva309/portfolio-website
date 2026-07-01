@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const shootingStars = [];
     
     function spawnShootingStar() {
-        if (Math.random() > 0.97 && shootingStars.length < 3 && !isWarping) {
+        if (Math.random() > 0.995 && shootingStars.length < 2 && !isWarping) {
             const x = Math.random() * width;
             const y = Math.random() * (height / 2);
             const angle = Math.PI / 4 + (Math.random() - 0.5) * 0.2; // Diagonal down-right
@@ -229,8 +229,13 @@ document.addEventListener('DOMContentLoaded', () => {
             isWarping = true;
             document.body.style.pointerEvents = 'none'; // disable clicks during warp
             tooltip.style.opacity = '0';
+            const targetUrl = `project.html?id=${hoveredStar.project.id}`;
             setTimeout(() => {
-                window.location.href = `project.html?id=${hoveredStar.project.id}`;
+                // Reset state so that back button (bfcache) doesn't load a frozen screen
+                isWarping = false;
+                warpSpeed = 0;
+                document.body.style.pointerEvents = 'auto';
+                window.location.assign(targetUrl);
             }, 600);
         }
     });
@@ -247,14 +252,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (isWarping) warpSpeed += 1.5;
 
-        // Shift background image
+        // Shift background image (reduced parallax)
         const bgSection = document.getElementById('constellation-section');
         if (bgSection && !isWarping) {
-            bgSection.style.backgroundPosition = `calc(50% + ${currentParallaxX * 15}px) calc(50% + ${currentParallaxY * 15}px)`;
+            bgSection.style.backgroundPosition = `calc(50% + ${currentParallaxX * 5}px) calc(50% + ${currentParallaxY * 5}px)`;
         }
 
         // Draw planet in the background
-        drawPlanet(ctx, width * 0.8 + currentParallaxX * 5, height * 0.2 + currentParallaxY * 5, 100);
+        drawPlanet(ctx, width * 0.8 + currentParallaxX * 2, height * 0.2 + currentParallaxY * 2, 100);
 
         // Draw background stars with shimmer
         bgStars.forEach(s => {
@@ -265,8 +270,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (s.y < 0) s.y = height;
             if (s.y > height) s.y = 0;
             
-            let drawX = s.x + currentParallaxX * 15;
-            let drawY = s.y + currentParallaxY * 15;
+            let drawX = s.x + currentParallaxX * 8;
+            let drawY = s.y + currentParallaxY * 8;
 
             if (isWarping) {
                 const dx = drawX - width/2;
@@ -301,8 +306,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         constellations.forEach(star => {
             // Organic drifting logic
-            let drawX = star.anchorX + Math.sin(timeMs * star.driftSpeedX + star.driftOffsetX) * star.driftRadius + currentParallaxX * 30;
-            let drawY = star.anchorY + Math.cos(timeMs * star.driftSpeedY + star.driftOffsetY) * star.driftRadius + currentParallaxY * 30;
+            let drawX = star.anchorX + Math.sin(timeMs * star.driftSpeedX + star.driftOffsetX) * star.driftRadius + currentParallaxX * 12;
+            let drawY = star.anchorY + Math.cos(timeMs * star.driftSpeedY + star.driftOffsetY) * star.driftRadius + currentParallaxY * 12;
             
             if (isWarping) {
                 const dx = drawX - width/2;
