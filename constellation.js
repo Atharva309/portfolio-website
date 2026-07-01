@@ -198,10 +198,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             constellations.push({
+                anchorX: x,
+                anchorY: y,
                 x: x,
                 y: y,
                 vx: 0,
                 vy: 0,
+                driftOffsetX: Math.random() * Math.PI * 2,
+                driftOffsetY: Math.random() * Math.PI * 2,
+                driftSpeedX: 0.0003 + Math.random() * 0.0004,
+                driftSpeedY: 0.0003 + Math.random() * 0.0004,
+                driftRadius: 15 + Math.random() * 20, // Drift within 15-35px radius
                 twinkleOffset: Math.random() * Math.PI * 2,
                 baseRadius: 10 + Math.random() * 6,
                 currentRadius: 10,
@@ -251,7 +258,32 @@ document.addEventListener('DOMContentLoaded', () => {
     function draw() {
         ctx.clearRect(0, 0, width, height);
 
-        const time = Date.now() * 0.002;
+        // Draw Nebula/Stardust effect
+        ctx.globalCompositeOperation = 'screen';
+        
+        // Dynamic nebula positions based on time
+        const timeMs = Date.now();
+        const nTime = timeMs * 0.0001;
+        
+        const nebulas = [
+            { x: width * 0.3 + Math.sin(nTime) * 100, y: height * 0.3 + Math.cos(nTime) * 100, r: Math.max(width, height) * 0.5, color: 'rgba(75, 0, 130, 0.15)' }, // Purple
+            { x: width * 0.7 + Math.cos(nTime * 0.8) * 100, y: height * 0.7 + Math.sin(nTime * 0.8) * 100, r: Math.max(width, height) * 0.5, color: 'rgba(0, 191, 255, 0.1)' }, // Blue
+            { x: width * 0.5 + Math.sin(nTime * 1.2) * 50, y: height * 0.5 + Math.cos(nTime * 1.2) * 50, r: Math.max(width, height) * 0.6, color: 'rgba(255, 20, 147, 0.05)' }  // Pink
+        ];
+
+        nebulas.forEach(n => {
+            let grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+            grad.addColorStop(0, n.color);
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        
+        ctx.globalCompositeOperation = 'source-over';
+
+        const time = timeMs * 0.002;
 
         // Draw planet in the background
         drawPlanet(ctx, width * 0.8, height * 0.2, 100);
@@ -280,7 +312,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let currentHover = null;
 
         constellations.forEach(star => {
-            // Stars are stationary as requested
+            // Organic drifting logic
+            star.x = star.anchorX + Math.sin(timeMs * star.driftSpeedX + star.driftOffsetX) * star.driftRadius;
+            star.y = star.anchorY + Math.cos(timeMs * star.driftSpeedY + star.driftOffsetY) * star.driftRadius;
             
             // Check hover
             const dx = mouseX - star.x;
