@@ -163,6 +163,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             constellations.push({
+                originalAnchorX: x,
+                originalAnchorY: y,
                 anchorX: x,
                 anchorY: y,
                 x: x,
@@ -206,6 +208,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let isWarping = false;
     let warpSpeed = 0;
 
+    // Reset warp state if loaded from bfcache
+    window.addEventListener('pageshow', (e) => {
+        if (e.persisted || isWarping) {
+            isWarping = false;
+            warpSpeed = 0;
+            document.body.style.pointerEvents = 'auto';
+            constellations.forEach(star => {
+                star.anchorX = star.originalAnchorX;
+                star.anchorY = star.originalAnchorY;
+            });
+        }
+    });
+
     canvas.addEventListener('mousemove', (e) => {
         const rect = canvas.getBoundingClientRect();
         mouseX = e.clientX - rect.left;
@@ -235,6 +250,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 isWarping = false;
                 warpSpeed = 0;
                 document.body.style.pointerEvents = 'auto';
+                constellations.forEach(star => {
+                    star.anchorX = star.originalAnchorX;
+                    star.anchorY = star.originalAnchorY;
+                });
                 window.location.assign(targetUrl);
             }, 600);
         }
