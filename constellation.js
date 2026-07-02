@@ -11,16 +11,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const tooltipImage = document.getElementById('tooltip-image');
     const tooltipDesc = document.getElementById('tooltip-desc');
 
+    let numCategories = 1; // Will be updated when data is parsed
+
     function resize() {
         width = window.innerWidth;
-        height = window.innerHeight;
+        // Make canvas height scale with number of categories
+        height = window.innerHeight * numCategories;
         canvas.width = width;
         canvas.height = height;
+        
+        // Also ensure the section stretches to fit canvas height
+        const section = document.getElementById('constellation-section');
+        if (section) section.style.minHeight = `${height}px`;
     }
     
-    window.addEventListener('resize', resize);
-    resize();
-
+    // Defer initial resize until data is parsed
     window.constellationFilter = 'all';
 
     function drawStarShape(ctx, cx, cy, spikes, outerRadius, innerRadius) {
@@ -122,17 +127,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const constellations = [];
     const categoryNames = Object.keys(categories);
-    const numCategories = categoryNames.length;
+    numCategories = Math.max(1, categoryNames.length);
     
-    // Distribute centers
-    // Distribute centers explicitly to avoid overlap
+    // Now that numCategories is known, we can resize the canvas
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Distribute centers vertically
     categoryNames.forEach((cat, index) => {
-        let centerX;
-        if (index === 0) centerX = width * 0.25;
-        else if (index === 1) centerX = width * 0.50;
-        else centerX = width * 0.75;
+        const centerX = width / 2;
+        const centerY = (index + 0.5) * window.innerHeight; // One viewport height apart
         
-        const centerY = height / 2 + (Math.random() * 100 - 50);
+        // Inject HTML Title for this category
+        const section = document.getElementById('constellation-section');
+        if (section) {
+            const titleEl = document.createElement('h3');
+            titleEl.textContent = cat;
+            titleEl.style.position = 'absolute';
+            titleEl.style.top = `${index * window.innerHeight + window.innerHeight * 0.15}px`;
+            titleEl.style.left = '50%';
+            titleEl.style.transform = 'translateX(-50%)';
+            titleEl.style.fontSize = '2.5rem';
+            titleEl.style.color = 'var(--primary)';
+            titleEl.style.textShadow = '0 0 15px rgba(108, 99, 255, 0.5)';
+            titleEl.style.pointerEvents = 'none';
+            titleEl.style.zIndex = '10';
+            section.appendChild(titleEl);
+        }
         
         categories[cat].forEach((project, pIndex) => {
             let placed = false;
@@ -263,8 +284,12 @@ document.addEventListener('DOMContentLoaded', () => {
             bgSection.style.backgroundPosition = `calc(50% + ${currentParallaxX * 5}px) calc(50% + ${currentParallaxY * 5}px)`;
         }
 
-        // Draw planet in the background
-        drawPlanet(ctx, width * 0.8 + currentParallaxX * 2, height * 0.2 + currentParallaxY * 2, 100);
+        // Draw planet in the background for each section
+        for (let i = 0; i < numCategories; i++) {
+            const planetY = i * window.innerHeight + window.innerHeight * 0.2 + currentParallaxY * 2;
+            const planetX = (i % 2 === 0 ? width * 0.8 : width * 0.2) + currentParallaxX * 2;
+            drawPlanet(ctx, planetX, planetY, 100);
+        }
 
         // Draw background stars with shimmer
         bgStars.forEach(s => {
