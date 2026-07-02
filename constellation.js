@@ -82,12 +82,65 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.restore();
     }
 
+    function drawSpaceship(ctx, x, y, size) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(Math.PI / 4); // Fly diagonally up-right
+        
+        // Ship Body (triangular/sleek)
+        ctx.beginPath();
+        ctx.moveTo(0, -size);
+        ctx.lineTo(size/3, size/2);
+        ctx.lineTo(-size/3, size/2);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(200, 220, 255, 0.8)';
+        ctx.fill();
+        
+        // Cockpit window
+        ctx.beginPath();
+        ctx.moveTo(0, -size/2);
+        ctx.lineTo(size/6, 0);
+        ctx.lineTo(-size/6, 0);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(0, 255, 255, 0.6)';
+        ctx.fill();
+        
+        // Engine Glow (Thruster)
+        ctx.beginPath();
+        ctx.moveTo(-size/4, size/2);
+        ctx.lineTo(size/4, size/2);
+        ctx.lineTo(0, size * 1.5);
+        ctx.closePath();
+        let glow = ctx.createLinearGradient(0, size/2, 0, size * 1.5);
+        glow.addColorStop(0, 'rgba(0, 255, 255, 0.8)');
+        glow.addColorStop(1, 'rgba(0, 0, 255, 0)');
+        ctx.fillStyle = glow;
+        ctx.fill();
+        
+        // Wings
+        ctx.beginPath();
+        ctx.moveTo(size/3, size/4);
+        ctx.lineTo(size/1.5, size/2);
+        ctx.lineTo(size/3, size/2);
+        ctx.fillStyle = 'rgba(150, 180, 255, 0.7)';
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.moveTo(-size/3, size/4);
+        ctx.lineTo(-size/1.5, size/2);
+        ctx.lineTo(-size/3, size/2);
+        ctx.fillStyle = 'rgba(150, 180, 255, 0.7)';
+        ctx.fill();
+        
+        ctx.restore();
+    }
+
     const shootingStars = [];
     
     function spawnShootingStar() {
-        if (Math.random() > 0.995 && shootingStars.length < 2 && !isWarping) {
+        if (Math.random() > 0.95 && shootingStars.length < 8 && !isWarping) {
             const x = Math.random() * width;
-            const y = Math.random() * (height / 2);
+            const y = Math.random() * height; // Spawn anywhere across the full height
             const angle = Math.PI / 4 + (Math.random() - 0.5) * 0.2; // Diagonal down-right
             const speed = 15 + Math.random() * 10;
             const length = 50 + Math.random() * 100;
@@ -291,11 +344,16 @@ document.addEventListener('DOMContentLoaded', () => {
             bgSection.style.backgroundPosition = `calc(50% + ${currentParallaxX * 5}px) calc(50% + ${currentParallaxY * 5}px)`;
         }
 
-        // Draw planet in the background for each section
+        // Draw planet or spaceship in the background for each section
         for (let i = 0; i < numCategories; i++) {
             const planetY = (i + 0.8) * window.innerHeight + currentParallaxY * 2;
             const planetX = (i % 2 === 0 ? width * 0.8 : width * 0.2) + currentParallaxX * 2;
-            drawPlanet(ctx, planetX, planetY, 120 + (i * 20), i); // Varying sizes and colors
+            
+            if (i === 1) {
+                drawSpaceship(ctx, planetX, planetY, 80);
+            } else {
+                drawPlanet(ctx, planetX, planetY, 120 + (i * 20), i); // Varying sizes and colors
+            }
         }
 
         // Draw background stars with shimmer
