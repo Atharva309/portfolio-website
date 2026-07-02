@@ -36,11 +36,11 @@
 
     <section id="constellation-section" style="position: relative; width: 100vw; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(rgba(2, 6, 23, 0.93), rgba(2, 6, 23, 0.98)), url('https://www.nasa.gov/wp-content/uploads/2023/03/main_image_star-forming_region_carina_nircam_final-5mb.jpg') no-repeat center center / cover;">
         <!-- Container has pointer-events: none so it doesn't block canvas hovers -->
-        <div class="container" style="position: absolute; top: 120px; left: 0; width: 100%; z-index: 10; text-align: center; pointer-events: none; display: flex; flex-direction: column; align-items: center;">
-            <h2 class="section-title" style="margin-bottom: 0.5rem; justify-content: center; font-size: 4rem; text-shadow: 0 0 20px rgba(255,255,255,0.2);">My Projects</h2>
+        <div class="container" style="position: absolute; top: 5rem; left: 2rem; z-index: 10; pointer-events: none; display: flex; flex-direction: column; align-items: flex-start; text-align: left;">
+            <h2 class="section-title" style="margin-bottom: 0.5rem; font-size: 3.5rem; text-shadow: 0 0 20px rgba(255,255,255,0.2);">My Projects</h2>
             <p style="color: var(--text-muted); font-size: 1.1rem; letter-spacing: 0.05em; margin-bottom: 1rem;">Hover and click to see my projects</p>
             
-            <div class="projects-filter" style="margin-top: 1rem; margin-bottom: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; pointer-events: auto;">
+            <div class="projects-filter" style="margin-top: 1rem; margin-bottom: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: flex-start; pointer-events: auto;">
                 <button class="filter-btn active" data-filter="all" style="padding: 0.5rem 1rem; border-radius: 20px; background: var(--primary); border: none; color: white; cursor: pointer; font-family: 'Inter'; font-weight: 600;">All</button>
                 <button class="filter-btn" data-filter="AI/ML" style="padding: 0.5rem 1rem; border-radius: 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-muted); cursor: pointer; font-family: 'Inter'; font-weight: 500;">AI/ML</button>
                 <button class="filter-btn" data-filter="Data Analytics" style="padding: 0.5rem 1rem; border-radius: 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-muted); cursor: pointer; font-family: 'Inter'; font-weight: 500;">Data Analytics</button>
