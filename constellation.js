@@ -415,8 +415,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         constellations.forEach(star => {
             // Organic drifting logic
-            let drawX = star.anchorX + Math.sin(timeMs * star.driftSpeedX + star.driftOffsetX) * star.driftRadius + currentParallaxX * star.z;
-            let drawY = star.anchorY + Math.cos(timeMs * star.driftSpeedY + star.driftOffsetY) * star.driftRadius + currentParallaxY * star.z;
+            let drawX = star.anchorX + Math.sin(timeMs * star.driftSpeedX + star.driftOffsetX) * star.driftRadius + currentParallaxX * 12;
+            let drawY = star.anchorY + Math.cos(timeMs * star.driftSpeedY + star.driftOffsetY) * star.driftRadius + currentParallaxY * 12;
             
             star.x = drawX;
             star.y = drawY;
@@ -450,12 +450,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     const dy = constellations[i].y - constellations[j].y;
                     const dist = Math.sqrt(dx*dx + dy*dy);
                     
-                    // Logarithmic-style fade: drops quickly but never goes completely to 0 (minimum 0.03)
                     let alpha = Math.max(0.03, 0.6 - (dist / 400));
                     
-                    ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
-                    if (category === 'AI/ML') ctx.strokeStyle = `rgba(150, 140, 255, ${alpha + 0.1})`;
-                    if (category === 'Data Analytics') ctx.strokeStyle = `rgba(0, 255, 255, ${alpha + 0.1})`;
+                    if (category === 'AI/ML') {
+                        ctx.strokeStyle = `rgba(150, 140, 255, ${alpha + 0.1})`;
+                    } else if (category === 'Data Analytics') {
+                        ctx.strokeStyle = `rgba(0, 255, 255, ${alpha + 0.1})`;
+                    } else {
+                        // Cloud / Full-Stack is red
+                        ctx.strokeStyle = `rgba(255, 69, 0, ${alpha + 0.1})`;
+                    }
                     
                     ctx.beginPath();
                     ctx.moveTo(constellations[i].x, constellations[i].y);
@@ -481,8 +485,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillStyle = '#00FFFF';
                 ctx.shadowColor = '#00FFFF';
             } else {
-                ctx.fillStyle = '#FFFFFF';
-                ctx.shadowColor = '#FFFFFF';
+                ctx.fillStyle = '#FF4500'; // Orange Red
+                ctx.shadowColor = '#FF4500';
             }
             
             ctx.shadowBlur = isDimmed ? 0 : 25;
