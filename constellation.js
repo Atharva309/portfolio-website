@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.lineTo(size/3, size/2);
         ctx.lineTo(-size/3, size/2);
         ctx.closePath();
-        ctx.fillStyle = 'rgba(200, 220, 255, 0.8)';
+        ctx.fillStyle = 'rgba(200, 220, 255, 0.2)'; // Made much duller
         ctx.fill();
         
         // Cockpit window
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.lineTo(size/6, 0);
         ctx.lineTo(-size/6, 0);
         ctx.closePath();
-        ctx.fillStyle = 'rgba(0, 255, 255, 0.6)';
+        ctx.fillStyle = 'rgba(0, 255, 255, 0.15)';
         ctx.fill();
         
         // Engine Glow (Thruster)
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.lineTo(0, size * 1.5);
         ctx.closePath();
         let glow = ctx.createLinearGradient(0, size/2, 0, size * 1.5);
-        glow.addColorStop(0, 'rgba(0, 255, 255, 0.8)');
+        glow.addColorStop(0, 'rgba(0, 255, 255, 0.3)');
         glow.addColorStop(1, 'rgba(0, 0, 255, 0)');
         ctx.fillStyle = glow;
         ctx.fill();
@@ -122,14 +122,14 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.moveTo(size/3, size/4);
         ctx.lineTo(size/1.5, size/2);
         ctx.lineTo(size/3, size/2);
-        ctx.fillStyle = 'rgba(150, 180, 255, 0.7)';
+        ctx.fillStyle = 'rgba(150, 180, 255, 0.15)';
         ctx.fill();
         
         ctx.beginPath();
         ctx.moveTo(-size/3, size/4);
         ctx.lineTo(-size/1.5, size/2);
         ctx.lineTo(-size/3, size/2);
-        ctx.fillStyle = 'rgba(150, 180, 255, 0.7)';
+        ctx.fillStyle = 'rgba(150, 180, 255, 0.15)';
         ctx.fill();
         
         ctx.restore();
@@ -207,9 +207,13 @@ document.addEventListener('DOMContentLoaded', () => {
             titleEl.style.top = `${(index + 0.9) * window.innerHeight - 350}px`; // Extra clearance for the large 260px radius
             titleEl.style.left = '50%';
             titleEl.style.transform = 'translateX(-50%)';
+            // Define colors matching the background planets
+            const themeColors = ['#b48cff', '#64b4ff', '#ff6482'];
+            const titleColor = themeColors[index % themeColors.length];
+            
             titleEl.style.fontSize = '2.5rem';
-            titleEl.style.color = 'var(--primary)';
-            titleEl.style.textShadow = '0 0 15px rgba(108, 99, 255, 0.5)';
+            titleEl.style.color = titleColor;
+            titleEl.style.textShadow = `0 0 15px ${titleColor}`;
             titleEl.style.pointerEvents = 'none';
             titleEl.style.zIndex = '10';
             section.appendChild(titleEl);
