@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function resize() {
         width = window.innerWidth;
         // Make canvas height scale with number of categories + some padding
-        height = window.innerHeight * (numCategories + 0.8);
+        height = window.innerHeight * (numCategories + 1.2);
         canvas.width = width;
         canvas.height = height;
         
@@ -196,15 +196,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // Distribute centers vertically
     categoryNames.forEach((cat, index) => {
         const centerX = width / 2;
-        const centerY = (index + 0.9) * window.innerHeight; // Pushed further down
+        const centerY = (index + 1.2) * window.innerHeight; // Pushed further down
         
         // Inject HTML Title for this category
         const section = document.getElementById('constellation-section');
         if (section) {
+            if (index === 0) {
+                // Inject the main title block above the first constellation
+                const mainTitle = document.createElement('div');
+                mainTitle.style.position = 'absolute';
+                mainTitle.style.top = `${window.innerHeight * 0.25}px`; // Centered in the top gap
+                mainTitle.style.left = '50%';
+                mainTitle.style.transform = 'translateX(-50%)';
+                mainTitle.style.textAlign = 'center';
+                mainTitle.style.pointerEvents = 'none';
+                mainTitle.style.zIndex = '10';
+                mainTitle.innerHTML = `
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 4rem; margin: 0 0 10px 0; text-shadow: 0 0 20px rgba(255,255,255,0.2); color: var(--text-main);">My Projects</h2>
+                    <p style="color: var(--text-muted); font-size: 1.2rem; letter-spacing: 0.05em; margin: 0 0 10px 0;">Hover and click to see my projects</p>
+                    <p style="color: var(--primary); font-size: 1.2rem; font-weight: 600; margin: 0; animation: subtleBounce 2s infinite;">Keep scrolling down! <i class="fas fa-arrow-down"></i></p>
+                `;
+                section.appendChild(mainTitle);
+            }
+
             const titleEl = document.createElement('h3');
             titleEl.textContent = cat;
             titleEl.style.position = 'absolute';
-            titleEl.style.top = `${(index + 0.9) * window.innerHeight - 350}px`; // Extra clearance for the large 260px radius
+            titleEl.style.top = `${(index + 1.2) * window.innerHeight - 350}px`; // Extra clearance
             titleEl.style.left = '50%';
             titleEl.style.transform = 'translateX(-50%)';
             // Define colors matching the background planets
@@ -350,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Draw planet or spaceship in the background for each section
         for (let i = 0; i < numCategories; i++) {
-            const planetY = (i + 0.8) * window.innerHeight + currentParallaxY * 2;
+            const planetY = (i + 1.1) * window.innerHeight + currentParallaxY * 2;
             const planetX = (i % 2 === 0 ? width * 0.8 : width * 0.2) + currentParallaxX * 2;
             
             if (i === 1) {

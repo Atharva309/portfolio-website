@@ -59,12 +59,6 @@
                 <i class="fas fa-arrow-left"></i> Return Home
             </a>
             
-            <h2 style="font-family: 'Outfit', sans-serif; font-size: 3.5rem; margin: 0 0 10px 0; text-shadow: 0 0 20px rgba(255,255,255,0.2);">My Projects</h2>
-            
-            <p style="color: var(--text-muted); font-size: 1.1rem; letter-spacing: 0.05em; margin: 0 0 10px 0;">Hover and click to see my projects</p>
-            
-            <p style="color: var(--primary); font-size: 1.1rem; font-weight: 600; margin: 0 0 35px 0; animation: subtleBounce 2s infinite;">Keep scrolling down! <i class="fas fa-arrow-down"></i></p>
-            
             <div style="position: sticky; top: 25px; display: flex; flex-direction: column; gap: 15px; pointer-events: auto; width: max-content;">
                 <button class="nav-btn" onclick="scrollToCategory(0)">AI / ML</button>
                 <button class="nav-btn" onclick="scrollToCategory(1)">Data Analytics</button>
@@ -90,7 +84,7 @@
     <script>
         function scrollToCategory(index) {
             // Formula matches title placement in constellation.js
-            const targetY = (index + 0.9) * window.innerHeight - 360;
+            const targetY = (index + 1.2) * window.innerHeight - 360;
             window.scrollTo({
                 top: targetY,
                 behavior: 'smooth'
