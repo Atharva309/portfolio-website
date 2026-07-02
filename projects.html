@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Projects | Atharva Patil</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="overflow: hidden;">
+    <nav class="navbar scrolled">
+        <div class="logo"><a href="index.html" style="color:inherit; text-decoration:none;">Atharva Patil</a></div>
+        <ul class="nav-links">
+            <li class="dropdown">
+                <a href="about.html" class="dropbtn">About <i class="fas fa-chevron-down" style="font-size: 0.8em; margin-left: 4px;"></i></a>
+                <div class="dropdown-content">
+                    <a href="about.html#experience">Experience</a>
+                    <a href="about.html#skills">Skills</a>
+                    <a href="about.html#contact">Contact</a>
+                </div>
+            </li>
+            <li><a href="projects.html" class="highlight">Projects</a></li>
+        </ul>
+    </nav>
+
+    <section id="constellation-section" style="position: relative; width: 100vw; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(rgba(2, 6, 23, 0.93), rgba(2, 6, 23, 0.98)), url('https://www.nasa.gov/wp-content/uploads/2023/03/main_image_star-forming_region_carina_nircam_final-5mb.jpg') no-repeat center center / cover;">
+        <!-- Container has pointer-events: none so it doesn't block canvas hovers -->
+        <div class="container" style="position: absolute; top: 120px; left: 0; width: 100%; z-index: 10; text-align: center; pointer-events: none;">
+            <h2 class="section-title reveal" style="margin-bottom: 0.5rem; justify-content: center;">Project Universe</h2>
+            
+            <div class="projects-filter reveal" style="margin-top: 1rem; margin-bottom: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; pointer-events: auto;">
+                <button class="filter-btn active" data-filter="all" style="padding: 0.5rem 1rem; border-radius: 20px; background: var(--primary); border: none; color: white; cursor: pointer; font-family: 'Inter'; font-weight: 600;">All</button>
+                <button class="filter-btn" data-filter="AI/ML" style="padding: 0.5rem 1rem; border-radius: 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-muted); cursor: pointer; font-family: 'Inter'; font-weight: 500;">AI/ML</button>
+                <button class="filter-btn" data-filter="Data Analytics" style="padding: 0.5rem 1rem; border-radius: 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-muted); cursor: pointer; font-family: 'Inter'; font-weight: 500;">Data Analytics</button>
+                <button class="filter-btn" data-filter="Cloud/Full-Stack" style="padding: 0.5rem 1rem; border-radius: 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-muted); cursor: pointer; font-family: 'Inter'; font-weight: 500;">Cloud/Full-Stack</button>
+            </div>
+        </div>
+
+        <canvas id="constellationCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; outline: none;"></canvas>
+        
+        <div id="star-tooltip" style="position: absolute; pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 100; transform: translate(20px, -20px);">
+        <div class="glass-card" style="padding: 1rem; border-radius: 12px; width: 280px; background: rgba(15, 23, 42, 0.9); box-shadow: 0 10px 40px rgba(0,0,0,0.8); border-color: rgba(255,255,255,0.1);">
+            <img id="tooltip-image" src="" alt="Project Preview" style="width: 100%; height: 130px; object-fit: cover; border-radius: 8px; margin-bottom: 0.75rem; display: none; border: 1px solid rgba(255,255,255,0.1);">
+            <h4 id="tooltip-title" style="margin-bottom: 0.25rem; font-size: 1.1rem; line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Project Title</h4>
+            <span id="tooltip-category" style="font-size: 0.8rem; color: var(--secondary); font-weight: 600; display: block; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Category</span>
+            <p id="tooltip-desc" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">Description goes here...</p>
+        </div>
+    </div>     <!-- Hover Hint -->
+        <div style="position: absolute; bottom: 30px; right: 30px; z-index: 100; pointer-events: none; color: white; font-family: 'Inter', sans-serif; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; background: rgba(15, 23, 42, 0.7); padding: 10px 20px; border-radius: 20px; border: 1px solid var(--primary); backdrop-filter: blur(4px); box-shadow: 0 0 10px rgba(108, 99, 255, 0.3);">
+            <i class="fas fa-mouse-pointer"></i> Hover on stars to see my projects
+        </div>
+    </section>
+
+    <script src="data.js"></script>
+    <script src="constellation.js"></script>
+    <script src="projects.js"></script>
+</body>
+</html>
