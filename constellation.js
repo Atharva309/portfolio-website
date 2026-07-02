@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
         width = window.innerWidth;
         const isMobile = width <= 768;
         const topPadding = isMobile ? 1.5 : 1.2;
-        // Make canvas height scale with number of categories + some padding
-        height = window.innerHeight * (numCategories + topPadding);
+        // Make canvas height scale exactly to fit the last constellation, without massive empty space
+        height = window.innerHeight * (numCategories - 1 + topPadding + 0.6);
         canvas.width = width;
         canvas.height = height;
         
@@ -345,6 +345,8 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.addEventListener('click', () => {
         if (hoveredStar && !isWarping) {
             isWarping = true;
+            clickedStarRef = hoveredStar;
+            warpRadius = 0;
             document.body.style.pointerEvents = 'none'; // disable clicks during warp
             tooltip.style.opacity = '0';
             const targetUrl = `project.html?id=${hoveredStar.project.id}`;
@@ -363,8 +365,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Parallax smooth interpolation
         currentParallaxX += (targetParallaxX - currentParallaxX) * 0.05;
         currentParallaxY += (targetParallaxY - currentParallaxY) * 0.05;
-
-        if (isWarping) warpSpeed += 1.5;
 
         // Shift background image (reduced parallax)
         const bgSection = document.getElementById('constellation-section');
@@ -396,31 +396,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (s.y < 0) s.y = height;
             if (s.y > height) s.y = 0;
             
-            let drawX = s.x + currentParallaxX * 8;
-            let drawY = s.y + currentParallaxY * 8;
-
-            if (isWarping) {
-                const dx = drawX - width/2;
-                const dy = drawY - height/2;
-                const angle = Math.atan2(dy, dx);
-                s.x += Math.cos(angle) * warpSpeed;
-                s.y += Math.sin(angle) * warpSpeed;
-                drawX = s.x;
-                drawY = s.y;
-                
-                ctx.beginPath();
-                ctx.moveTo(drawX, drawY);
-                ctx.lineTo(drawX - Math.cos(angle) * warpSpeed * 2, drawY - Math.sin(angle) * warpSpeed * 2);
-                ctx.strokeStyle = `rgba(255, 255, 255, 0.8)`;
-                ctx.lineWidth = s.radius;
-                ctx.stroke();
-            } else {
-                const twinkle = Math.sin(time + s.twinkleOffset) * 0.5 + 0.5; // 0.0 to 1.0
-                ctx.fillStyle = `rgba(255, 255, 255, ${twinkle * 0.8})`; // Max opacity 0.8
-                ctx.beginPath();
-                ctx.arc(drawX, drawY, s.radius, 0, Math.PI * 2);
-                ctx.fill();
-            }
+            let drawX = s.x + currentParallaxX * s.z;
+            let drawY = s.y + currentParallaxY * s.z;
+            
+            const twinkle = Math.sin(time + s.twinkleOffset) * 0.5 + 0.5; // 0.0 to 1.0
+            ctx.fillStyle = `rgba(255, 255, 255, ${twinkle * 0.8})`; // Max opacity 0.8
+            ctx.beginPath();
+            ctx.arc(drawX, drawY, s.radius, 0, Math.PI * 2);
+            ctx.fill();
         });
 
         // Spawn and draw space objects
@@ -432,18 +415,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         constellations.forEach(star => {
             // Organic drifting logic
-            let drawX = star.anchorX + Math.sin(timeMs * star.driftSpeedX + star.driftOffsetX) * star.driftRadius + currentParallaxX * 12;
-            let drawY = star.anchorY + Math.cos(timeMs * star.driftSpeedY + star.driftOffsetY) * star.driftRadius + currentParallaxY * 12;
-            
-            if (isWarping) {
-                const dx = drawX - width/2;
-                const dy = drawY - height/2;
-                const angle = Math.atan2(dy, dx);
-                star.anchorX += Math.cos(angle) * warpSpeed * 0.6;
-                star.anchorY += Math.sin(angle) * warpSpeed * 0.6;
-                drawX = star.anchorX;
-                drawY = star.anchorY;
-            }
+            let drawX = star.anchorX + Math.sin(timeMs * star.driftSpeedX + star.driftOffsetX) * star.driftRadius + currentParallaxX * star.z;
+            let drawY = star.anchorY + Math.cos(timeMs * star.driftSpeedY + star.driftOffsetY) * star.driftRadius + currentParallaxY * star.z;
             
             star.x = drawX;
             star.y = drawY;
@@ -515,24 +488,30 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.shadowBlur = isDimmed ? 0 : 25;
             
             // Draw 4-point star flare
-            if (isWarping) {
-                const dx = star.x - width/2;
-                const dy = star.y - height/2;
-                const angle = Math.atan2(dy, dx);
-                ctx.beginPath();
-                ctx.moveTo(star.x, star.y);
-                ctx.lineTo(star.x - Math.cos(angle) * warpSpeed * 1.5, star.y - Math.sin(angle) * warpSpeed * 1.5);
-                ctx.strokeStyle = ctx.fillStyle;
-                ctx.lineWidth = star.currentRadius;
-                ctx.stroke();
-            } else {
-                drawStarShape(ctx, star.x, star.y, 4, star.currentRadius * 1.5, star.currentRadius * 0.3);
-                ctx.fill();
-            }
+            drawStarShape(ctx, star.x, star.y, 4, star.currentRadius * 1.5, star.currentRadius * 0.3);
+            ctx.fill();
             
             ctx.shadowBlur = 0; // reset
             ctx.globalAlpha = 1.0; // reset
         });
+
+        // Simple, clean expanding energy flash on click
+        if (isWarping && clickedStarRef) {
+            warpRadius += width / 20; // Rapidly expand over ~20 frames
+            const opacity = Math.min(1, warpRadius / (width * 0.6));
+            
+            // Outer bright flash
+            ctx.beginPath();
+            ctx.arc(clickedStarRef.x, clickedStarRef.y, warpRadius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(248, 250, 252, ${opacity})`;
+            ctx.fill();
+            
+            // Inner core glow
+            ctx.beginPath();
+            ctx.arc(clickedStarRef.x, clickedStarRef.y, warpRadius * 0.7, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(108, 99, 255, ${opacity * 0.8})`; // Use primary theme color
+            ctx.fill();
+        }
 
         // Handle tooltip
         if (currentHover) {
