@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function resize() {
         width = window.innerWidth;
-        // Make canvas height scale with number of categories
-        height = window.innerHeight * numCategories;
+        // Make canvas height scale with number of categories + some padding
+        height = window.innerHeight * (numCategories + 0.5);
         canvas.width = width;
         canvas.height = height;
         
@@ -51,14 +51,21 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.closePath();
     }
 
-    function drawPlanet(ctx, x, y, radius) {
+    function drawPlanet(ctx, x, y, radius, typeIndex = 0) {
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(Math.PI / 6); // tilt
         
+        const colors = [
+            ['rgba(75, 0, 130, 0.4)', 'rgba(150, 140, 255, 0.2)'], // Deep purple
+            ['rgba(0, 80, 180, 0.4)', 'rgba(100, 180, 255, 0.2)'], // Deep blue
+            ['rgba(180, 50, 80, 0.4)', 'rgba(255, 100, 130, 0.2)'] // Crimson
+        ];
+        const color = colors[typeIndex % colors.length];
+
         // Planet body
         let gradient = ctx.createLinearGradient(-radius, -radius, radius, radius);
-        gradient.addColorStop(0, 'rgba(75, 0, 130, 0.4)'); // Deep purple transparent
+        gradient.addColorStop(0, color[0]); 
         gradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
         ctx.fillStyle = gradient;
         ctx.beginPath();
@@ -68,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Ring
         ctx.beginPath();
         ctx.ellipse(0, 0, radius * 2.2, radius * 0.4, 0, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(150, 140, 255, 0.2)';
+        ctx.strokeStyle = color[1];
         ctx.lineWidth = 4;
         ctx.stroke();
         
@@ -136,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Distribute centers vertically
     categoryNames.forEach((cat, index) => {
         const centerX = width / 2;
-        const centerY = (index + 0.5) * window.innerHeight; // One viewport height apart
+        const centerY = (index + 0.8) * window.innerHeight; // Pushed down so first isn't hidden
         
         // Inject HTML Title for this category
         const section = document.getElementById('constellation-section');
@@ -144,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const titleEl = document.createElement('h3');
             titleEl.textContent = cat;
             titleEl.style.position = 'absolute';
-            titleEl.style.top = `${index * window.innerHeight + window.innerHeight * 0.15}px`;
+            titleEl.style.top = `${(index + 0.8) * window.innerHeight - 250}px`;
             titleEl.style.left = '50%';
             titleEl.style.transform = 'translateX(-50%)';
             titleEl.style.fontSize = '2.5rem';
@@ -162,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             while (!placed && attempts < 150) {
                 const angle = Math.random() * Math.PI * 2;
-                const radius = 30 + Math.random() * 130;
+                const radius = 60 + Math.random() * 200; // Increased constellation size
                 x = centerX + Math.cos(angle) * radius;
                 y = centerY + Math.sin(angle) * radius;
                 
@@ -286,9 +293,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Draw planet in the background for each section
         for (let i = 0; i < numCategories; i++) {
-            const planetY = i * window.innerHeight + window.innerHeight * 0.2 + currentParallaxY * 2;
+            const planetY = (i + 0.7) * window.innerHeight + currentParallaxY * 2;
             const planetX = (i % 2 === 0 ? width * 0.8 : width * 0.2) + currentParallaxX * 2;
-            drawPlanet(ctx, planetX, planetY, 100);
+            drawPlanet(ctx, planetX, planetY, 120 + (i * 20), i); // Varying sizes and colors
         }
 
         // Draw background stars with shimmer
