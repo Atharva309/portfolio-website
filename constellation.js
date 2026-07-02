@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function resize() {
         width = window.innerWidth;
         // Make canvas height scale with number of categories + some padding
-        height = window.innerHeight * (numCategories + 0.5);
+        height = window.innerHeight * (numCategories + 0.8);
         canvas.width = width;
         canvas.height = height;
         
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Distribute centers vertically
     categoryNames.forEach((cat, index) => {
         const centerX = width / 2;
-        const centerY = (index + 0.8) * window.innerHeight; // Pushed down so first isn't hidden
+        const centerY = (index + 0.9) * window.innerHeight; // Pushed further down
         
         // Inject HTML Title for this category
         const section = document.getElementById('constellation-section');
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const titleEl = document.createElement('h3');
             titleEl.textContent = cat;
             titleEl.style.position = 'absolute';
-            titleEl.style.top = `${(index + 0.8) * window.innerHeight - 250}px`;
+            titleEl.style.top = `${(index + 0.9) * window.innerHeight - 350}px`; // Extra clearance for the large 260px radius
             titleEl.style.left = '50%';
             titleEl.style.transform = 'translateX(-50%)';
             titleEl.style.fontSize = '2.5rem';
@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Draw planet in the background for each section
         for (let i = 0; i < numCategories; i++) {
-            const planetY = (i + 0.7) * window.innerHeight + currentParallaxY * 2;
+            const planetY = (i + 0.8) * window.innerHeight + currentParallaxY * 2;
             const planetX = (i % 2 === 0 ? width * 0.8 : width * 0.2) + currentParallaxX * 2;
             drawPlanet(ctx, planetX, planetY, 120 + (i * 20), i); // Varying sizes and colors
         }
