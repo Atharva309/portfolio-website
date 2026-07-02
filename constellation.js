@@ -15,8 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function resize() {
         width = window.innerWidth;
+        const isMobile = width <= 768;
+        const topPadding = isMobile ? 1.5 : 1.2;
         // Make canvas height scale with number of categories + some padding
-        height = window.innerHeight * (numCategories + 1.2);
+        height = window.innerHeight * (numCategories + topPadding);
         canvas.width = width;
         canvas.height = height;
         
@@ -194,9 +196,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', resize);
 
     // Distribute centers vertically
+    const isMobileLayout = window.innerWidth <= 768;
+    const spacingCoef = isMobileLayout ? 1.5 : 1.2;
+
     categoryNames.forEach((cat, index) => {
         const centerX = width / 2;
-        const centerY = (index + 1.2) * window.innerHeight; // Pushed further down
+        const centerY = (index + spacingCoef) * window.innerHeight; // Pushed further down
         
         // Inject HTML Title for this category
         const section = document.getElementById('constellation-section');
@@ -205,16 +210,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Inject the main title block above the first constellation
                 const mainTitle = document.createElement('div');
                 mainTitle.style.position = 'absolute';
-                mainTitle.style.top = `${window.innerHeight * 0.25}px`; // Centered in the top gap
+                mainTitle.style.top = isMobileLayout ? `${window.innerHeight * 0.35}px` : `${window.innerHeight * 0.25}px`; // Centered in the top gap
                 mainTitle.style.left = '50%';
                 mainTitle.style.transform = 'translateX(-50%)';
                 mainTitle.style.textAlign = 'center';
                 mainTitle.style.pointerEvents = 'none';
                 mainTitle.style.zIndex = '10';
+                mainTitle.style.width = '100%';
                 mainTitle.innerHTML = `
-                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 4rem; margin: 0 0 10px 0; text-shadow: 0 0 20px rgba(255,255,255,0.2); color: var(--text-main);">My Projects</h2>
-                    <p style="color: var(--text-muted); font-size: 1.2rem; letter-spacing: 0.05em; margin: 0 0 10px 0;">Hover and click to see my projects</p>
-                    <p style="color: var(--primary); font-size: 1.2rem; font-weight: 600; margin: 0; animation: subtleBounce 2s infinite;">Keep scrolling down! <i class="fas fa-arrow-down"></i></p>
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: ${isMobileLayout ? '2.5rem' : '4rem'}; margin: 0 0 10px 0; text-shadow: 0 0 20px rgba(255,255,255,0.2); color: var(--text-main);">My Projects</h2>
+                    <p style="color: var(--text-muted); font-size: ${isMobileLayout ? '1rem' : '1.2rem'}; letter-spacing: 0.05em; margin: 0 0 10px 0;">Hover and click to see my projects</p>
+                    <p style="color: var(--primary); font-size: ${isMobileLayout ? '1rem' : '1.2rem'}; font-weight: 600; margin: 0; animation: subtleBounce 2s infinite;">Keep scrolling down! <i class="fas fa-arrow-down"></i></p>
                 `;
                 section.appendChild(mainTitle);
             }
@@ -222,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const titleEl = document.createElement('h3');
             titleEl.textContent = cat;
             titleEl.style.position = 'absolute';
-            titleEl.style.top = `${(index + 1.2) * window.innerHeight - 350}px`; // Extra clearance
+            titleEl.style.top = `${(index + spacingCoef) * window.innerHeight - (isMobileLayout ? 250 : 350)}px`; // Extra clearance
             titleEl.style.left = '50%';
             titleEl.style.transform = 'translateX(-50%)';
             // Define colors matching the background planets
@@ -367,8 +373,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Draw planet or spaceship in the background for each section
+        const isMobileRender = window.innerWidth <= 768;
+        const renderSpacing = isMobileRender ? 1.4 : 1.1;
+
         for (let i = 0; i < numCategories; i++) {
-            const planetY = (i + 1.1) * window.innerHeight + currentParallaxY * 2;
+            const planetY = (i + renderSpacing) * window.innerHeight + currentParallaxY * 2;
             const planetX = (i % 2 === 0 ? width * 0.8 : width * 0.2) + currentParallaxX * 2;
             
             if (i === 1) {

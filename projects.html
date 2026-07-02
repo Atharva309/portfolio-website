@@ -84,7 +84,9 @@
     <script>
         function scrollToCategory(index) {
             // Formula matches title placement in constellation.js
-            const targetY = (index + 1.2) * window.innerHeight - 360;
+            const isMobile = window.innerWidth <= 768;
+            const spacing = isMobile ? 1.5 : 1.2;
+            const targetY = (index + spacing) * window.innerHeight - (isMobile ? 260 : 360);
             window.scrollTo({
                 top: targetY,
                 behavior: 'smooth'
