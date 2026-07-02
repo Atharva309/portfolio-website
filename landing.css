@@ -81,7 +81,7 @@ body {
     font-size: 1rem;
     font-weight: 300;
     letter-spacing: 0.1em;
-    opacity: 0;
+    opacity: 0.3;
     transition: opacity 0.5s ease;
     white-space: nowrap;
     text-transform: uppercase;

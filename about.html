@@ -11,6 +11,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <div id="about-background" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; background: #03020A;">
+        <canvas id="about-starfield" style="position: absolute; top: -50vh; left: -50vw; width: 200vw; height: 200vh;"></canvas>
+        <div id="about-planet" style="position: absolute; top: 10%; left: -20%; width: 140vw; height: 140vw; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #76569f 0%, #301f46 70%, #11091d 100%); transform-origin: center center;">
+            <div style="position: absolute; top: 50%; left: 50%; width: 150%; height: 150%; border: 15px solid rgba(212, 175, 55, 0.15); border-radius: 50%; transform: translate(-50%, -50%) rotateX(75deg) rotateY(15deg); pointer-events: none;"></div>
+        </div>
+    </div>
     <nav class="navbar">
         <div class="logo">Atharva Patil</div>
         <ul class="nav-links">
@@ -199,6 +205,6 @@
 
     <script src="data.js"></script>
     <script src="script.js"></script>
-    <script src="constellation.js"></script>
+    <script src="about-bg.js"></script>
 </body>
 </html>
