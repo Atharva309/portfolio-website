@@ -65,7 +65,12 @@
             z-index: 100;
         }
         .page-transitioning .gateway-label { opacity: 0; }
-        .page-transitioning #planet-container, .page-transitioning section, .page-transitioning header, .page-transitioning footer {
+        .page-transitioning #planet-container, 
+        .page-transitioning section:not(#projects-preview), 
+        .page-transitioning header, 
+        .page-transitioning footer,
+        .page-transitioning #projects-preview h2,
+        .page-transitioning #projects-preview p {
             opacity: 0;
             transition: opacity 0.5s ease;
         }
@@ -188,7 +193,7 @@
             </div>
         </div>
     </section>
-    <section id="projects-preview" style="text-align: center; padding: 4rem 0;">
+    <section id="projects-preview" style="text-align: center; padding-top: 4rem; padding-bottom: 0;">
         <div class="container reveal">
             <h2 class="section-title" style="justify-content: center; margin-bottom: 1.5rem;">My Projects</h2>
             <p style="color: var(--text-muted); margin-bottom: 1rem; max-width: 600px; margin-inline: auto;">Explore my full interactive constellation of AI, Data Analytics, and Cloud engineering projects.</p>
