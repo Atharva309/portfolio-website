@@ -12,7 +12,9 @@
 </head>
 <body>
     <style>
-        body { background: transparent !important; }
+        html, body { background: transparent !important; }
+        .hero { background: transparent !important; }
+        .hero::before { display: none !important; }
         @keyframes planetSlideIn {
             0% { transform: translateX(100vw); opacity: 0; }
             100% { transform: translateX(0); opacity: 1; }
