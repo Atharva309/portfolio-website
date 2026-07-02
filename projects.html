@@ -25,19 +25,6 @@
             color: var(--primary);
             transform: translateX(-5px);
         }
-        
-        .projects-nav {
-            position: sticky;
-            top: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            pointer-events: auto;
-            z-index: 100;
-            margin-top: 0.5rem;
-            margin-left: 2rem;
-            width: max-content;
-        }
         .nav-btn {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -64,22 +51,26 @@
         }
     </style>
     <section id="constellation-section" style="position: relative; width: 100vw; min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; background: linear-gradient(rgba(2, 6, 23, 0.93), rgba(2, 6, 23, 0.98)), url('https://www.nasa.gov/wp-content/uploads/2023/03/main_image_star-forming_region_carina_nircam_final-5mb.jpg') no-repeat center center / cover fixed;">
-        <!-- Container in normal flow for sticky behavior -->
-        <div class="container" style="margin-top: 0.5rem; margin-left: 1.5rem; z-index: 10; pointer-events: none; display: flex; flex-direction: column; align-items: flex-start; text-align: left;">
+        
+        <!-- Rebuilt Top Left Control Panel (Absolute coordinates lock it to exact top-left) -->
+        <div id="control-panel" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 25px 35px; pointer-events: none; z-index: 10; display: block;">
             
-            <a href="index.html" class="back-button" style="pointer-events: auto; margin-top: 0; margin-bottom: 1rem;">
+            <a href="index.html" class="back-button" style="pointer-events: auto; display: inline-flex; margin-bottom: 25px;">
                 <i class="fas fa-arrow-left"></i> Return Home
             </a>
-
-            <h2 class="section-title" style="margin-top: 0; margin-bottom: 0.2rem; font-size: 3.5rem; text-shadow: 0 0 20px rgba(255,255,255,0.2);">My Projects</h2>
-            <p style="margin-top: 0; color: var(--text-muted); font-size: 1.1rem; letter-spacing: 0.05em; margin-bottom: 0.2rem;">Hover and click to see my projects</p>
-            <p style="margin-top: 0; color: var(--primary); font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; animation: subtleBounce 2s infinite;">Keep scrolling down! <i class="fas fa-arrow-down"></i></p>
-        </div>
-        
-        <div class="projects-nav">
-            <button class="nav-btn" onclick="scrollToCategory(0)">AI / ML</button>
-            <button class="nav-btn" onclick="scrollToCategory(1)">Data Analytics</button>
-            <button class="nav-btn" onclick="scrollToCategory(2)">Cloud / Full-Stack</button>
+            
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 3.5rem; margin: 0 0 10px 0; text-shadow: 0 0 20px rgba(255,255,255,0.2);">My Projects</h2>
+            
+            <p style="color: var(--text-muted); font-size: 1.1rem; letter-spacing: 0.05em; margin: 0 0 10px 0;">Hover and click to see my projects</p>
+            
+            <p style="color: var(--primary); font-size: 1.1rem; font-weight: 600; margin: 0 0 35px 0; animation: subtleBounce 2s infinite;">Keep scrolling down! <i class="fas fa-arrow-down"></i></p>
+            
+            <div style="position: sticky; top: 25px; display: flex; flex-direction: column; gap: 15px; pointer-events: auto; width: max-content;">
+                <button class="nav-btn" onclick="scrollToCategory(0)">AI / ML</button>
+                <button class="nav-btn" onclick="scrollToCategory(1)">Data Analytics</button>
+                <button class="nav-btn" onclick="scrollToCategory(2)">Cloud / Full-Stack</button>
+            </div>
+            
         </div>
 
         <canvas id="constellationCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; outline: none; z-index: 1;"></canvas>
