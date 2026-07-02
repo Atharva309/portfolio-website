@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stars.push({
             x: Math.random() * width,
             y: Math.random() * height,
-            radius: Math.random() * 1.5 + 0.2,
+            radius: Math.random() * 2.0 + 0.5,
             twinkleOffset: Math.random() * Math.PI * 2,
             twinkleSpeed: 0.001 + Math.random() * 0.002
         });
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         stars.forEach(s => {
             const twinkle = Math.sin(timeMs * s.twinkleSpeed + s.twinkleOffset) * 0.5 + 0.5;
-            ctx.fillStyle = `rgba(255, 255, 255, ${twinkle * 0.7})`;
+            ctx.fillStyle = `rgba(255, 255, 255, ${twinkle * 0.8 + 0.2})`;
             ctx.beginPath();
             ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
             ctx.fill();
