@@ -112,6 +112,11 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             document.body.classList.add('page-transitioning');
+            const planetContainer = document.getElementById('planet-container');
+            if (planetContainer) {
+                planetContainer.classList.add('planet-scatter');
+            }
+            
             setTimeout(() => {
                 window.location.assign('projects.html');
             }, 800);

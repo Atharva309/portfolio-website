@@ -16,6 +16,25 @@
         .hero { background: transparent !important; }
         .hero::before { display: none !important; }
         
+        /* Back Button */
+        .back-button {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            z-index: 1000;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .back-button:hover {
+            color: var(--primary);
+            transform: translateX(-5px);
+        }
+        
         /* Nebula Gateway Styles */
         .gateway-container {
             position: relative;
@@ -65,7 +84,9 @@
             z-index: 100;
         }
         .page-transitioning .gateway-label { opacity: 0; }
-        .page-transitioning #planet-container, 
+        .page-transitioning #planet-container {
+            /* Handled by planet-scatter class */
+        }
         .page-transitioning section:not(#projects-preview), 
         .page-transitioning header, 
         .page-transitioning footer,
@@ -79,7 +100,17 @@
             0% { transform: translateX(100vw); opacity: 0; }
             100% { transform: translateX(0); opacity: 1; }
         }
+        .planet-scatter {
+            animation: planetFlyAway 0.8s cubic-bezier(0.5, 0, 1, 0.5) forwards !important;
+        }
+        @keyframes planetFlyAway {
+            to { transform: translate(-100vw, 100vh) scale(0.1); opacity: 0; }
+        }
     </style>
+    
+    <a href="index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i> Return Home
+    </a>
     <div id="about-background" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; background: #03020A;">
         <canvas id="about-starfield" style="position: absolute; top: -50vh; left: -50vw; width: 200vw; height: 200vh;"></canvas>
         <div id="planet-container" style="position: absolute; bottom: -15vw; left: -15vw; width: 60vw; height: 60vw; min-width: 500px; min-height: 500px; animation: planetSlideIn 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;">
