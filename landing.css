@@ -2,7 +2,7 @@
     --bg-color: #03020A;
     --text-name: #F0EEF8;
     --text-roles: #4A4860;
-    --nebula-glow: rgba(160, 200, 255, 0.4);
+    --nebula-glow: rgba(160, 200, 255, 0.7);
     --planet-base: #5a3e7a;
     --planet-ring: #d4af37;
 }
@@ -105,12 +105,12 @@ body {
     height: 100%;
     border-radius: 50%;
     background: radial-gradient(circle, var(--nebula-glow) 0%, rgba(3,2,10,0) 70%);
-    opacity: 0.5;
+    opacity: 0.85;
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
 .top-left:hover .nebula-glow {
-    opacity: 0.8;
+    opacity: 1;
     transform: scale(1.1);
 }
 
