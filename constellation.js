@@ -310,6 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 anchorY: y,
                 x: x,
                 y: y,
+                colorTheme: index,
                 vx: 0,
                 vy: 0,
                 driftOffsetX: Math.random() * Math.PI * 2,
