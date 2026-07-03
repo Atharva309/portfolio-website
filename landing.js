@@ -30,6 +30,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let isScattering = false;
     let scatterOrigin = { x: 0, y: 0 };
 
+    // Astronaut Setup
+    const astroImg = new Image();
+    astroImg.src = 'assets/astronaut.png';
+    let astro = {
+        x: -200,
+        y: Math.random() * height,
+        vx: 0.2 + Math.random() * 0.3,
+        vy: (Math.random() - 0.5) * 0.2,
+        rot: 0,
+        rotSpeed: (Math.random() - 0.5) * 0.005,
+        size: 150
+    };
+
     function draw() {
         ctx.clearRect(0, 0, width, height);
         const timeMs = Date.now();
@@ -64,6 +77,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fill();
             }
         });
+
+        // Draw Astronaut
+        if (astroImg.complete) {
+            astro.x += astro.vx;
+            astro.y += astro.vy;
+            astro.rot += astro.rotSpeed;
+
+            // Reset when off-screen
+            if (astro.x > width + 200 || astro.y < -200 || astro.y > height + 200) {
+                astro.x = -200;
+                astro.y = Math.random() * height;
+                astro.vx = 0.2 + Math.random() * 0.3;
+                astro.vy = (Math.random() - 0.5) * 0.2;
+                astro.rotSpeed = (Math.random() - 0.5) * 0.005;
+                astro.size = 100 + Math.random() * 100;
+            }
+
+            ctx.save();
+            ctx.globalCompositeOperation = 'screen'; // Removes black background
+            ctx.translate(astro.x, astro.y);
+            ctx.rotate(astro.rot);
+            // Floating bobbing effect
+            const bobY = Math.sin(timeMs * 0.001) * 10;
+            ctx.drawImage(astroImg, -astro.size/2, -astro.size/2 + bobY, astro.size, astro.size);
+            ctx.restore();
+        }
 
         requestAnimationFrame(draw);
     }
