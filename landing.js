@@ -96,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             ctx.save();
             // Removed 'screen' composite operation to support proper transparent PNGs
+            ctx.globalAlpha = 0.65; // Make the astronaut slightly dimmer
             ctx.translate(astro.x, astro.y);
             ctx.rotate(astro.rot);
             // Floating bobbing effect
