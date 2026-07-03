@@ -89,6 +89,9 @@
         </ul>
     </nav>
 
+    <!-- Animated Dynamic Background for Project Theme -->
+    <canvas id="project-bg-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; background: #03020A;"></canvas>
+
     <div id="error-message" style="display: none; padding-top: 150px; text-align: center; color: var(--text-muted);">
         <h2>Project not found</h2>
         <a href="projects.html" class="btn-secondary" style="margin-top: 2rem;">Back to Projects</a>
@@ -133,6 +136,7 @@
     </footer>
 
     <script src="data.js"></script>
+    <script src="project-bg.js"></script>
     <script src="project-detail.js"></script>
 </body>
 </html>

@@ -93,11 +93,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // A space cloud (nebula) is drawn using multiple overlapping radial gradients
         const puffCenters = [
-            { dx: 0, dy: 0, r: radius * 1.5, color: 'rgba(255, 69, 0, 0.15)' }, // Red-orange center
-            { dx: -radius*0.6, dy: -radius*0.3, r: radius * 1.2, color: 'rgba(255, 100, 0, 0.1)' },
-            { dx: radius*0.7, dy: radius*0.2, r: radius * 1.3, color: 'rgba(200, 50, 0, 0.1)' },
-            { dx: -radius*0.2, dy: radius*0.6, r: radius, color: 'rgba(255, 140, 0, 0.08)' },
-            { dx: radius*0.4, dy: -radius*0.7, r: radius, color: 'rgba(150, 0, 50, 0.12)' }
+            { dx: 0, dy: 0, r: radius * 1.5, color: 'rgba(255, 69, 0, 0.3)' }, // Red-orange center
+            { dx: -radius*0.6, dy: -radius*0.3, r: radius * 1.2, color: 'rgba(255, 100, 0, 0.25)' },
+            { dx: radius*0.7, dy: radius*0.2, r: radius * 1.3, color: 'rgba(200, 50, 0, 0.25)' },
+            { dx: -radius*0.2, dy: radius*0.6, r: radius, color: 'rgba(255, 140, 0, 0.2)' },
+            { dx: radius*0.4, dy: -radius*0.7, r: radius, color: 'rgba(150, 0, 50, 0.25)' }
         ];
         
         puffCenters.forEach(puff => {
@@ -382,10 +382,15 @@ document.addEventListener('DOMContentLoaded', () => {
             warpRadius = 0;
             document.body.style.pointerEvents = 'none'; // disable clicks during warp
             tooltip.style.opacity = '0';
-            const targetUrl = `project.html?id=${hoveredStar.project.id}`;
+            
+            let bgType = 'planet';
+            if(hoveredStar.colorTheme === 1) bgType = 'spaceship';
+            if(hoveredStar.colorTheme === 2) bgType = 'nebula';
+            
+            const targetUrl = `project.html?id=${hoveredStar.project.id}&theme=${hoveredStar.colorTheme}&bg=${bgType}`;
             setTimeout(() => {
                 window.location.assign(targetUrl);
-            }, 600);
+            }, 800);
         }
     });
 
@@ -534,22 +539,50 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.globalAlpha = 1.0; // reset
         });
 
-        // Simple, clean expanding energy flash on click
+        // Geometric expanding pulse on click
         if (isWarping && clickedStarRef) {
-            warpRadius += width / 20; // Rapidly expand over ~20 frames
-            const opacity = Math.min(1, warpRadius / (width * 0.6));
+            warpRadius += width / 60; // Expand rate
+            const opacity = Math.max(0, 1 - (warpRadius / (width * 0.8)));
             
-            // Outer bright flash
-            ctx.beginPath();
-            ctx.arc(clickedStarRef.x, clickedStarRef.y, warpRadius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(248, 250, 252, ${opacity})`;
-            ctx.fill();
+            let pulseColor = '255, 255, 255';
+            if(clickedStarRef.colorTheme === 0) pulseColor = '180, 140, 255';
+            else if(clickedStarRef.colorTheme === 1) pulseColor = '0, 255, 255';
+            else if(clickedStarRef.colorTheme === 2) pulseColor = '255, 69, 0';
+
+            ctx.save();
+            ctx.translate(clickedStarRef.x, clickedStarRef.y);
             
-            // Inner core glow
+            // Draw spinning inner hexagon
+            ctx.rotate(warpRadius * 0.05);
             ctx.beginPath();
-            ctx.arc(clickedStarRef.x, clickedStarRef.y, warpRadius * 0.7, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(108, 99, 255, ${opacity * 0.8})`; // Use primary theme color
-            ctx.fill();
+            for(let j=0; j<=6; j++) {
+                const angle = j * Math.PI / 3;
+                const hx = Math.cos(angle) * warpRadius * 0.5;
+                const hy = Math.sin(angle) * warpRadius * 0.5;
+                if(j===0) ctx.moveTo(hx, hy);
+                else ctx.lineTo(hx, hy);
+            }
+            ctx.strokeStyle = `rgba(${pulseColor}, ${opacity})`;
+            ctx.lineWidth = 4 + (warpRadius * 0.01);
+            ctx.shadowColor = `rgba(${pulseColor}, ${opacity})`;
+            ctx.shadowBlur = 20;
+            ctx.stroke();
+
+            // Draw counter-spinning outer hexagon
+            ctx.rotate(-warpRadius * 0.1);
+            ctx.beginPath();
+            for(let j=0; j<=6; j++) {
+                const angle = j * Math.PI / 3;
+                const hx = Math.cos(angle) * warpRadius;
+                const hy = Math.sin(angle) * warpRadius;
+                if(j===0) ctx.moveTo(hx, hy);
+                else ctx.lineTo(hx, hy);
+            }
+            ctx.strokeStyle = `rgba(${pulseColor}, ${opacity * 0.5})`;
+            ctx.lineWidth = 2 + (warpRadius * 0.005);
+            ctx.stroke();
+
+            ctx.restore();
         }
 
         // Handle tooltip
