@@ -602,6 +602,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         tooltipImage.style.display = 'none';
                     }
                 }
+
+                // Dynamic Tooltip Theming
+                let ttColor = 'rgba(255, 255, 255, 0.2)';
+                let glowColor = 'rgba(0, 0, 0, 0.8)';
+                let catColor = '#b48cff';
+                if (hoveredStar.colorTheme === 0) { ttColor = 'rgba(180, 140, 255, 0.6)'; glowColor = 'rgba(180, 140, 255, 0.2)'; catColor = '#b48cff'; }
+                else if (hoveredStar.colorTheme === 1) { ttColor = 'rgba(0, 255, 255, 0.6)'; glowColor = 'rgba(0, 255, 255, 0.2)'; catColor = '#00ffff'; }
+                else if (hoveredStar.colorTheme === 2) { ttColor = 'rgba(255, 69, 0, 0.6)'; glowColor = 'rgba(255, 69, 0, 0.2)'; catColor = '#ff4500'; }
+
+                const card = tooltip.querySelector('.glass-card');
+                if (card) {
+                    card.style.borderColor = ttColor;
+                    card.style.boxShadow = `0 10px 40px rgba(0,0,0,0.8), 0 0 20px ${glowColor}`;
+                }
+                if (tooltipCategory) {
+                    tooltipCategory.style.color = catColor;
+                    tooltipCategory.style.textShadow = `0 0 8px ${glowColor}`;
+                }
+
                 tooltip.style.opacity = '1';
                 canvas.style.cursor = 'pointer';
             }
