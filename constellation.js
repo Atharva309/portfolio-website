@@ -300,6 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bgStars.push({
             x: Math.random() * width,
             y: Math.random() * height,
+            z: Math.random() * 6 + 2, // Added z property for parallax math
             radius: Math.random() * 1.5 + 0.5,
             vx: (Math.random() - 0.5) * 0.05,
             vy: (Math.random() - 0.5) * 0.05,
