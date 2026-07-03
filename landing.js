@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         body.classList.add('page-transitioning', 'to-projects');
         setTimeout(() => {
             window.location.assign('projects.html');
-        }, 800);
+        }, 2000); // Increased timeout to let animation finish completely
     });
 
     // Reset state for bfcache
