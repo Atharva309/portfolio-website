@@ -217,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 mainTitle.style.pointerEvents = 'none';
                 mainTitle.style.zIndex = '10';
                 mainTitle.style.width = '100%';
+                mainTitle.style.animation = 'uiFadeIn 1.2s ease-out 0.6s both'; // Fades in slowly
                 mainTitle.innerHTML = `
                     <h2 style="font-family: 'Outfit', sans-serif; font-size: ${isMobileLayout ? '2.5rem' : '4rem'}; margin: 0 0 10px 0; text-shadow: 0 0 20px rgba(255,255,255,0.2); color: var(--text-main);">My Projects</h2>
                     <p style="color: var(--text-muted); font-size: ${isMobileLayout ? '1rem' : '1.2rem'}; letter-spacing: 0.05em; margin: 0 0 10px 0;">Hover and click to see my projects</p>
@@ -240,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
             titleEl.style.textShadow = `0 0 15px ${titleColor}`;
             titleEl.style.pointerEvents = 'none';
             titleEl.style.zIndex = '10';
+            titleEl.style.animation = 'uiFadeIn 1.2s ease-out 0.8s both'; // Fades in slowly
             section.appendChild(titleEl);
         }
         
