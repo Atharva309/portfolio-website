@@ -49,11 +49,21 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(5px); }
         }
+        
+        @keyframes projectsSlideIn {
+            0% { transform: translateX(-100vw); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes uiFadeIn {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
     </style>
-    <section id="constellation-section" style="position: relative; width: 100vw; min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; background: var(--bg-dark);">
+    <section id="constellation-section" style="position: relative; width: 100vw; min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; background: var(--bg-dark); overflow: hidden;">
         
         <!-- Rebuilt Top Left Control Panel (Absolute coordinates lock it to exact top-left) -->
-        <div id="control-panel" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 25px 35px; pointer-events: none; z-index: 10; display: block;">
+        <div id="control-panel" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 25px 35px; pointer-events: none; z-index: 10; display: block; animation: uiFadeIn 1s ease-out 0.5s both;">
             
             <a href="index.html" class="back-button" style="pointer-events: auto; display: inline-flex; margin-bottom: 25px;">
                 <i class="fas fa-arrow-left"></i> Return Home
@@ -67,7 +77,7 @@
             
         </div>
 
-        <canvas id="constellationCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; outline: none; z-index: 1;"></canvas>
+        <canvas id="constellationCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; outline: none; z-index: 1; pointer-events: auto; animation: projectsSlideIn 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;"></canvas>
         
         <div id="star-tooltip" style="position: absolute; pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 100; transform: translate(20px, -20px);">
         <div class="glass-card" style="padding: 1rem; border-radius: 12px; width: 280px; background: rgba(15, 23, 42, 0.9); box-shadow: 0 10px 40px rgba(0,0,0,0.8); border-color: rgba(255,255,255,0.1);">
