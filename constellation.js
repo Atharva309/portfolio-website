@@ -84,6 +84,36 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.restore();
     }
 
+    function drawNebulaCloud(ctx, x, y, radius, time) {
+        ctx.save();
+        ctx.translate(x, y);
+        
+        // Slow rotation for a swirling gas effect
+        ctx.rotate(time * 0.1); 
+        
+        // A space cloud (nebula) is drawn using multiple overlapping radial gradients
+        const puffCenters = [
+            { dx: 0, dy: 0, r: radius * 1.5, color: 'rgba(255, 69, 0, 0.15)' }, // Red-orange center
+            { dx: -radius*0.6, dy: -radius*0.3, r: radius * 1.2, color: 'rgba(255, 100, 0, 0.1)' },
+            { dx: radius*0.7, dy: radius*0.2, r: radius * 1.3, color: 'rgba(200, 50, 0, 0.1)' },
+            { dx: -radius*0.2, dy: radius*0.6, r: radius, color: 'rgba(255, 140, 0, 0.08)' },
+            { dx: radius*0.4, dy: -radius*0.7, r: radius, color: 'rgba(150, 0, 50, 0.12)' }
+        ];
+        
+        puffCenters.forEach(puff => {
+            let gradient = ctx.createRadialGradient(puff.dx, puff.dy, 0, puff.dx, puff.dy, puff.r);
+            gradient.addColorStop(0, puff.color);
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            
+            ctx.beginPath();
+            ctx.arc(puff.dx, puff.dy, puff.r, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+        });
+        
+        ctx.restore();
+    }
+
     function drawSpaceship(ctx, x, y, size) {
         ctx.save();
         ctx.translate(x, y);
@@ -385,6 +415,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (i === 1) {
                 drawSpaceship(ctx, planetX, planetY, 80);
+            } else if (i === 2) {
+                drawNebulaCloud(ctx, planetX, planetY, 140, time);
             } else {
                 drawPlanet(ctx, planetX, planetY, 120 + (i * 20), i); // Varying sizes and colors
             }
