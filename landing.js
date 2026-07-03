@@ -35,9 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
     astroImg.src = 'assets/astronaut.png';
     let astro = {
         x: -200,
-        y: Math.random() * height,
-        vx: 0.2 + Math.random() * 0.3,
-        vy: (Math.random() - 0.5) * 0.2,
+        y: height + 200,
+        vx: 0.3 + Math.random() * 0.3,
+        vy: -0.3 - Math.random() * 0.3,
         rot: 0,
         rotSpeed: (Math.random() - 0.5) * 0.005,
         size: 150
@@ -84,18 +84,18 @@ document.addEventListener('DOMContentLoaded', () => {
             astro.y += astro.vy;
             astro.rot += astro.rotSpeed;
 
-            // Reset when off-screen
-            if (astro.x > width + 200 || astro.y < -200 || astro.y > height + 200) {
-                astro.x = -200;
-                astro.y = Math.random() * height;
-                astro.vx = 0.2 + Math.random() * 0.3;
-                astro.vy = (Math.random() - 0.5) * 0.2;
+            // Reset when off-screen top right
+            if (astro.x > width + 200 || astro.y < -200) {
+                astro.x = -200 - Math.random() * 200; // start a bit further left randomly
+                astro.y = height + 200 + Math.random() * 200; // start a bit further down randomly
+                astro.vx = 0.3 + Math.random() * 0.3;
+                astro.vy = -0.3 - Math.random() * 0.3;
                 astro.rotSpeed = (Math.random() - 0.5) * 0.005;
-                astro.size = 100 + Math.random() * 100;
+                astro.size = 120 + Math.random() * 60;
             }
 
             ctx.save();
-            ctx.globalCompositeOperation = 'screen'; // Removes black background
+            // Removed 'screen' composite operation to support proper transparent PNGs
             ctx.translate(astro.x, astro.y);
             ctx.rotate(astro.rot);
             // Floating bobbing effect
