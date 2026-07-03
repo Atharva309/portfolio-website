@@ -79,20 +79,20 @@
 
     </section>
 
-    <!-- Entry Light Overlay -->
-    <div id="entry-light-overlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 150%); z-index: 9999; pointer-events: none; transition: transform 1.2s cubic-bezier(0.1, 1, 0.2, 1), opacity 1.2s ease-out; transform-origin: bottom right; transform: scale(1); opacity: 1;"></div>
+    <!-- Entry Light Overlay (Reverse Nebula) -->
+    <div id="entry-portal" style="position: fixed; top: 50%; left: 50%; width: 200vw; height: 200vw; margin-top: -100vw; margin-left: -100vw; background: radial-gradient(circle, #fff 0%, rgba(108, 99, 255, 0.8) 20%, transparent 60%); z-index: 9999; pointer-events: none; transition: transform 1.1s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1.1s ease-in; transform-origin: center center; transform: scale(1); opacity: 1;"></div>
 
     <script src="data.js"></script>
     <script src="constellation.js"></script>
     <script>
         // Trigger entry animation overlay
         window.addEventListener('load', () => {
-            const overlay = document.getElementById('entry-light-overlay');
-            if (overlay) {
+            const portal = document.getElementById('entry-portal');
+            if (portal) {
                 // Short delay ensures it's visible on first paint before shrinking
                 setTimeout(() => {
-                    overlay.style.transform = 'scale(0)';
-                    overlay.style.opacity = '0';
+                    portal.style.transform = 'scale(0)';
+                    portal.style.opacity = '0';
                 }, 50);
             }
         });
