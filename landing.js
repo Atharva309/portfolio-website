@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isScattering = false;
     let scatterOrigin = { x: 0, y: 0 };
 
-    // Astronaut Setup
+    // Astronaut & Ship Setup
     const astroImg = new Image();
     astroImg.src = 'assets/astronaut.png';
     let astro = {
@@ -41,8 +41,81 @@ document.addEventListener('DOMContentLoaded', () => {
         rot: 0,
         rotSpeed: (Math.random() - 0.5) * 0.005,
         size: 150,
-        isHovered: false
+        isHovered: false,
+        wonShipGrid: null // Will store the gridMap array when game is won
     };
+
+    function drawCustomShip(ctx, gridMapArray, size) {
+        if (!gridMapArray || gridMapArray.length === 0) return;
+        
+        let minC = 999, maxC = -999, minR = 999, maxR = -999;
+        gridMapArray.forEach(([key, part]) => {
+            const [c, r] = key.split(',').map(Number);
+            if (c < minC) minC = c;
+            if (c > maxC) maxC = c;
+            if (r < minR) minR = r;
+            if (r > maxR) maxR = r;
+        });
+
+        const cols = maxC - minC + 1;
+        const rows = maxR - minR + 1;
+        const maxDim = Math.max(cols, rows);
+        const cellSize = size / maxDim;
+        
+        const offsetX = -((minC + maxC) / 2) * cellSize - cellSize/2;
+        const offsetY = -((minR + maxR) / 2) * cellSize - cellSize/2;
+
+        ctx.save();
+        
+        // Draw Trophy Hat on top
+        const hatY = offsetY + minR * cellSize - cellSize * 0.8;
+        ctx.fillStyle = '#ffd700'; // Gold
+        ctx.beginPath();
+        ctx.moveTo(0, hatY - cellSize*0.8);
+        ctx.lineTo(-cellSize*0.6, hatY + cellSize*0.2);
+        ctx.lineTo(cellSize*0.6, hatY + cellSize*0.2);
+        ctx.fill();
+        ctx.fillStyle = '#f39c12';
+        ctx.fillRect(-cellSize*0.6, hatY + cellSize*0.2, cellSize*1.2, cellSize*0.2);
+
+        gridMapArray.forEach(([key, part]) => {
+            const [c, r] = key.split(',').map(Number);
+            const x = offsetX + c * cellSize;
+            const y = offsetY + r * cellSize;
+            
+            ctx.save();
+            ctx.translate(x + cellSize/2, y + cellSize/2);
+            
+            let color = '#fff';
+            if (part.startsWith('thruster')) color = '#ffaa00';
+            else if (part === 'cockpit') color = '#00f0ff';
+            else if (part === 'block') color = '#5a6b8c';
+            
+            ctx.fillStyle = color;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = color;
+
+            if (part === 'cockpit' || part === 'block') {
+                ctx.fillRect(-cellSize/2, -cellSize/2, cellSize, cellSize);
+            } else if (part.startsWith('thruster')) {
+                let angle = 0;
+                if (part === 'thruster-right') angle = Math.PI/2;
+                if (part === 'thruster-down') angle = Math.PI;
+                if (part === 'thruster-left') angle = -Math.PI/2;
+                
+                ctx.rotate(angle);
+                ctx.beginPath();
+                ctx.moveTo(-cellSize/2, cellSize/2);
+                ctx.lineTo(cellSize/2, cellSize/2);
+                ctx.lineTo(cellSize/4, -cellSize/2);
+                ctx.lineTo(-cellSize/4, -cellSize/2);
+                ctx.fill();
+            }
+            ctx.restore();
+        });
+        
+        ctx.restore();
+    }
 
     function draw() {
         ctx.clearRect(0, 0, width, height);
@@ -111,7 +184,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.shadowColor = 'transparent';
             }
 
-            ctx.drawImage(astroImg, -astro.size/2, -astro.size/2 + bobY, astro.size, astro.size);
+            if (astro.wonShipGrid) {
+                drawCustomShip(ctx, astro.wonShipGrid, astro.size * 1.5); // Draw won ship slightly larger
+            } else {
+                ctx.drawImage(astroImg, -astro.size/2, -astro.size/2 + bobY, astro.size, astro.size);
+            }
             
             // Reset shadow so it doesn't affect other elements
             ctx.shadowBlur = 0;
@@ -236,6 +313,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     welcomeScreen.style.opacity = '0';
                     setTimeout(() => welcomeScreen.remove(), 800);
                 }, 3000);
+
+                // Check for win condition
+                const checkWinInterval = setInterval(() => {
+                    try {
+                        const win = iframe.contentWindow;
+                        if (win && win.state === 'WON' && win.currentLevel === 4) {
+                            if (win.gridMap) {
+                                astro.wonShipGrid = Array.from(win.gridMap.entries());
+                            }
+                            clearInterval(checkWinInterval);
+                        }
+                    } catch (e) {
+                        // Ignore cross-origin issues
+                    }
+                }, 1000);
+                
+                closeBtn.onclick = () => { 
+                    clearInterval(checkWinInterval);
+                    modal.remove(); 
+                };
             }
         }
     });
