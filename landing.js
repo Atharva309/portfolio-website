@@ -67,16 +67,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ctx.save();
         
-        // Draw Trophy Hat on top
+        // Draw Gold Crown Hat on top
         const hatY = offsetY + minR * cellSize - cellSize * 0.8;
         ctx.fillStyle = '#ffd700'; // Gold
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = '#ffd700';
         ctx.beginPath();
-        ctx.moveTo(0, hatY - cellSize*0.8);
-        ctx.lineTo(-cellSize*0.6, hatY + cellSize*0.2);
-        ctx.lineTo(cellSize*0.6, hatY + cellSize*0.2);
+        ctx.moveTo(-cellSize*0.4, hatY + cellSize*0.2); // Bottom left
+        ctx.lineTo(-cellSize*0.6, hatY - cellSize*0.4); // Top left point
+        ctx.lineTo(-cellSize*0.2, hatY - cellSize*0.1); // Inner dip
+        ctx.lineTo(0, hatY - cellSize*0.6);             // Top middle point
+        ctx.lineTo(cellSize*0.2, hatY - cellSize*0.1);  // Inner dip
+        ctx.lineTo(cellSize*0.6, hatY - cellSize*0.4);  // Top right point
+        ctx.lineTo(cellSize*0.4, hatY + cellSize*0.2); // Bottom right
+        ctx.closePath();
         ctx.fill();
-        ctx.fillStyle = '#f39c12';
-        ctx.fillRect(-cellSize*0.6, hatY + cellSize*0.2, cellSize*1.2, cellSize*0.2);
+        
+        ctx.fillStyle = '#f39c12'; // Darker gold base
+        ctx.fillRect(-cellSize*0.4, hatY + cellSize*0.2, cellSize*0.8, cellSize*0.15);
+        ctx.shadowBlur = 0;
 
         gridMapArray.forEach(([key, part]) => {
             const [c, r] = key.split(',').map(Number);
@@ -185,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (astro.wonShipGrid) {
-                drawCustomShip(ctx, astro.wonShipGrid, astro.size * 1.5); // Draw won ship slightly larger
+                drawCustomShip(ctx, astro.wonShipGrid, astro.size * 0.9); // Draw won ship slightly smaller
             } else {
                 ctx.drawImage(astroImg, -astro.size/2, -astro.size/2 + bobY, astro.size, astro.size);
             }
