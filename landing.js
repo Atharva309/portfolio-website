@@ -105,9 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (astro.isHovered) {
                 ctx.beginPath();
-                ctx.arc(0, bobY, astro.size/1.8, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(0, 255, 255, 0.15)';
-                ctx.shadowBlur = 40;
+                ctx.arc(0, bobY, astro.size/2.5, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 255, 255, 0.1)';
+                ctx.shadowBlur = 20;
                 ctx.shadowColor = 'cyan';
                 ctx.fill();
             }
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 modal.style.display = 'flex';
                 modal.style.flexDirection = 'column';
                 modal.style.overflow = 'hidden';
-                modal.style.animation = 'uiFadeIn 0.3s ease-out both';
+                modal.style.animation = 'uiFadeIn 0.8s ease-out both';
                 
                 // Floating Close Button
                 const closeBtn = document.createElement('button');
