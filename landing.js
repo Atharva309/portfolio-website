@@ -314,13 +314,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(() => welcomeScreen.remove(), 800);
                 }, 3000);
 
-                // Check for win condition
+                // Check for win condition via iframe DOM
                 const checkWinInterval = setInterval(() => {
                     try {
-                        const win = iframe.contentWindow;
-                        if (win && win.state === 'WON' && win.currentLevel === 4) {
-                            if (win.gridMap) {
-                                astro.wonShipGrid = Array.from(win.gridMap.entries());
+                        const winDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        if (!winDoc) return;
+                        
+                        const msgText = winDoc.getElementById('message-text');
+                        const levelInd = winDoc.getElementById('level-indicator');
+                        
+                        if (msgText && msgText.innerText === 'GALAXY SAVED!' && 
+                            levelInd && levelInd.innerText.includes('5/5')) {
+                            
+                            // Reconstruct the ship grid from the DOM cells
+                            const cells = winDoc.querySelectorAll('#build-grid .grid-cell');
+                            let reconstructedGrid = [];
+                            cells.forEach(cell => {
+                                const c = cell.dataset.col;
+                                const r = cell.dataset.row;
+                                let part = null;
+                                cell.classList.forEach(cls => {
+                                    if (cls.startsWith('cell-')) {
+                                        part = cls.replace('cell-', '');
+                                    }
+                                });
+                                if (part) {
+                                    reconstructedGrid.push([`${c},${r}`, part]);
+                                }
+                            });
+                            
+                            if (reconstructedGrid.length > 0) {
+                                astro.wonShipGrid = reconstructedGrid;
                             }
                             clearInterval(checkWinInterval);
                         }
