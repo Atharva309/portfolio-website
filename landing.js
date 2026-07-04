@@ -40,7 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
         vy: -0.3 - Math.random() * 0.3,
         rot: 0,
         rotSpeed: (Math.random() - 0.5) * 0.005,
-        size: 150
+        size: 150,
+        isHovered: false
     };
 
     function draw() {
@@ -101,6 +102,16 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.rotate(astro.rot);
             // Floating bobbing effect
             const bobY = Math.sin(timeMs * 0.001) * 10;
+            
+            if (astro.isHovered) {
+                ctx.beginPath();
+                ctx.arc(0, bobY, astro.size/1.8, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 255, 255, 0.15)';
+                ctx.shadowBlur = 40;
+                ctx.shadowColor = 'cyan';
+                ctx.fill();
+            }
+
             ctx.drawImage(astroImg, -astro.size/2, -astro.size/2 + bobY, astro.size, astro.size);
             ctx.restore();
         }
@@ -126,8 +137,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const dy = e.clientY - astro.y;
         if (Math.sqrt(dx*dx + dy*dy) < astro.size / 2) {
             canvas.style.cursor = 'pointer';
+            astro.isHovered = true;
         } else {
             canvas.style.cursor = 'default';
+            astro.isHovered = false;
         }
     });
 
@@ -154,46 +167,73 @@ document.addEventListener('DOMContentLoaded', () => {
                 modal.style.overflow = 'hidden';
                 modal.style.animation = 'uiFadeIn 0.3s ease-out both';
                 
-                const header = document.createElement('div');
-                header.style.padding = '10px 20px';
-                header.style.display = 'flex';
-                header.style.justifyContent = 'space-between';
-                header.style.alignItems = 'center';
-                header.style.background = 'rgba(0, 0, 0, 0.8)';
-                header.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
-                
-                const title = document.createElement('div');
-                title.innerText = '🚀 Space Builder';
-                title.style.color = '#fff';
-                title.style.fontFamily = 'Outfit, sans-serif';
-                title.style.fontWeight = 'bold';
-                title.style.letterSpacing = '1px';
-
+                // Floating Close Button
                 const closeBtn = document.createElement('button');
-                closeBtn.innerHTML = '✖ Close';
-                closeBtn.style.background = 'transparent';
+                closeBtn.innerHTML = '✖';
+                closeBtn.style.position = 'absolute';
+                closeBtn.style.top = '15px';
+                closeBtn.style.right = '20px';
+                closeBtn.style.background = 'rgba(0, 0, 0, 0.5)';
                 closeBtn.style.color = '#fff';
-                closeBtn.style.border = 'none';
+                closeBtn.style.border = '1px solid rgba(255,255,255,0.2)';
+                closeBtn.style.borderRadius = '50%';
+                closeBtn.style.width = '40px';
+                closeBtn.style.height = '40px';
                 closeBtn.style.cursor = 'pointer';
-                closeBtn.style.fontSize = '14px';
-                closeBtn.style.opacity = '0.7';
-                closeBtn.style.transition = 'opacity 0.2s';
-                closeBtn.onmouseover = () => closeBtn.style.opacity = '1';
-                closeBtn.onmouseout = () => closeBtn.style.opacity = '0.7';
+                closeBtn.style.fontSize = '18px';
+                closeBtn.style.zIndex = '10001'; // Above everything
+                closeBtn.style.display = 'flex';
+                closeBtn.style.alignItems = 'center';
+                closeBtn.style.justifyContent = 'center';
+                closeBtn.style.transition = 'background 0.2s, transform 0.2s';
+                closeBtn.onmouseover = () => { closeBtn.style.background = 'rgba(255,255,255,0.2)'; closeBtn.style.transform = 'scale(1.1)'; };
+                closeBtn.onmouseout = () => { closeBtn.style.background = 'rgba(0,0,0,0.5)'; closeBtn.style.transform = 'scale(1)'; };
                 closeBtn.onclick = () => { modal.remove(); };
+                
+                // Welcome Screen
+                const welcomeScreen = document.createElement('div');
+                welcomeScreen.style.position = 'absolute';
+                welcomeScreen.style.top = '0';
+                welcomeScreen.style.left = '0';
+                welcomeScreen.style.width = '100%';
+                welcomeScreen.style.height = '100%';
+                welcomeScreen.style.background = 'rgba(3, 2, 10, 0.95)';
+                welcomeScreen.style.zIndex = '10000';
+                welcomeScreen.style.display = 'flex';
+                welcomeScreen.style.alignItems = 'center';
+                welcomeScreen.style.justifyContent = 'center';
+                welcomeScreen.style.flexDirection = 'column';
+                welcomeScreen.style.color = '#fff';
+                welcomeScreen.style.fontFamily = 'Outfit, sans-serif';
+                welcomeScreen.style.textAlign = 'center';
+                welcomeScreen.style.transition = 'opacity 0.8s ease';
+                
+                welcomeScreen.innerHTML = `
+                    <h2 style="font-size: 2.5rem; margin-bottom: 1rem; color: #00ffff; text-shadow: 0 0 20px rgba(0,255,255,0.5);">Welcome to my Easter Egg!</h2>
+                    <p style="font-size: 1.2rem; color: #ccc;">Build your ship and reach home safely!</p>
+                `;
                 
                 const iframe = document.createElement('iframe');
                 iframe.src = './space-builder-game/index.html';
-                iframe.style.flex = '1';
-                iframe.style.border = 'none';
+                iframe.style.position = 'absolute';
+                iframe.style.top = '0';
+                iframe.style.left = '0';
                 iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
                 iframe.style.background = '#000';
+                iframe.style.zIndex = '9999';
                 
-                header.appendChild(title);
-                header.appendChild(closeBtn);
-                modal.appendChild(header);
                 modal.appendChild(iframe);
+                modal.appendChild(welcomeScreen);
+                modal.appendChild(closeBtn);
                 document.body.appendChild(modal);
+                
+                // Fade out welcome screen after 3 seconds
+                setTimeout(() => {
+                    welcomeScreen.style.opacity = '0';
+                    setTimeout(() => welcomeScreen.remove(), 800);
+                }, 3000);
             }
         }
     });
