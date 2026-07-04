@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         wonShipGrid: null // Will store the gridMap array when game is won
     };
 
-    function drawCustomShip(ctx, gridMapArray, size) {
+    function drawCustomShip(ctx, gridMapArray, size, isHovered) {
         if (!gridMapArray || gridMapArray.length === 0) return;
         
         let minC = 999, maxC = -999, minR = 999, maxR = -999;
@@ -70,8 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Draw Gold Crown Hat on top
         const hatY = offsetY + minR * cellSize - cellSize * 0.8;
         ctx.fillStyle = '#ffd700'; // Gold
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = '#ffd700';
+        ctx.shadowBlur = isHovered ? 30 : 15;
+        ctx.shadowColor = isHovered ? 'cyan' : '#ffd700';
         ctx.beginPath();
         ctx.moveTo(-cellSize*0.4, hatY + cellSize*0.2); // Bottom left
         ctx.lineTo(-cellSize*0.6, hatY - cellSize*0.4); // Top left point
@@ -101,8 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (part === 'block') color = '#5a6b8c';
             
             ctx.fillStyle = color;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = color;
+            ctx.shadowBlur = isHovered ? 30 : 10;
+            ctx.shadowColor = isHovered ? 'cyan' : color;
 
             if (part === 'cockpit' || part === 'block') {
                 ctx.fillRect(-cellSize/2, -cellSize/2, cellSize, cellSize);
@@ -185,17 +185,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Floating bobbing effect
             const bobY = Math.sin(timeMs * 0.001) * 10;
             
-            if (astro.isHovered) {
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = 'cyan';
-            } else {
-                ctx.shadowBlur = 0;
-                ctx.shadowColor = 'transparent';
-            }
-
             if (astro.wonShipGrid) {
-                drawCustomShip(ctx, astro.wonShipGrid, astro.size * 0.9); // Draw won ship slightly smaller
+                drawCustomShip(ctx, astro.wonShipGrid, astro.size * 0.9, astro.isHovered);
             } else {
+                if (astro.isHovered) {
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = 'cyan';
+                } else {
+                    ctx.shadowBlur = 0;
+                    ctx.shadowColor = 'transparent';
+                }
                 ctx.drawImage(astroImg, -astro.size/2, -astro.size/2 + bobY, astro.size, astro.size);
             }
             
