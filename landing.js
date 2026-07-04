@@ -119,6 +119,85 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     rotatePlanet();
 
+    // Clickable Astronaut Logic
+    canvas.addEventListener('mousemove', (e) => {
+        if (!astroImg.complete) return;
+        const dx = e.clientX - astro.x;
+        const dy = e.clientY - astro.y;
+        if (Math.sqrt(dx*dx + dy*dy) < astro.size / 2) {
+            canvas.style.cursor = 'pointer';
+        } else {
+            canvas.style.cursor = 'default';
+        }
+    });
+
+    canvas.addEventListener('click', (e) => {
+        if (!astroImg.complete) return;
+        const dx = e.clientX - astro.x;
+        const dy = e.clientY - astro.y;
+        if (Math.sqrt(dx*dx + dy*dy) < astro.size / 2) {
+            if (!document.getElementById('game-modal')) {
+                const modal = document.createElement('div');
+                modal.id = 'game-modal';
+                modal.style.position = 'fixed';
+                modal.style.top = '10vh';
+                modal.style.left = '10vw';
+                modal.style.width = '80vw';
+                modal.style.height = '80vh';
+                modal.style.backgroundColor = '#03020A';
+                modal.style.border = '1px solid rgba(0, 255, 255, 0.3)';
+                modal.style.borderRadius = '16px';
+                modal.style.boxShadow = '0 20px 60px rgba(0, 255, 255, 0.2)';
+                modal.style.zIndex = '9999';
+                modal.style.display = 'flex';
+                modal.style.flexDirection = 'column';
+                modal.style.overflow = 'hidden';
+                modal.style.animation = 'uiFadeIn 0.3s ease-out both';
+                
+                const header = document.createElement('div');
+                header.style.padding = '10px 20px';
+                header.style.display = 'flex';
+                header.style.justifyContent = 'space-between';
+                header.style.alignItems = 'center';
+                header.style.background = 'rgba(0, 0, 0, 0.8)';
+                header.style.borderBottom = '1px solid rgba(255, 255, 255, 0.1)';
+                
+                const title = document.createElement('div');
+                title.innerText = '🚀 Space Builder';
+                title.style.color = '#fff';
+                title.style.fontFamily = 'Outfit, sans-serif';
+                title.style.fontWeight = 'bold';
+                title.style.letterSpacing = '1px';
+
+                const closeBtn = document.createElement('button');
+                closeBtn.innerHTML = '✖ Close';
+                closeBtn.style.background = 'transparent';
+                closeBtn.style.color = '#fff';
+                closeBtn.style.border = 'none';
+                closeBtn.style.cursor = 'pointer';
+                closeBtn.style.fontSize = '14px';
+                closeBtn.style.opacity = '0.7';
+                closeBtn.style.transition = 'opacity 0.2s';
+                closeBtn.onmouseover = () => closeBtn.style.opacity = '1';
+                closeBtn.onmouseout = () => closeBtn.style.opacity = '0.7';
+                closeBtn.onclick = () => { modal.remove(); };
+                
+                const iframe = document.createElement('iframe');
+                iframe.src = './space-builder-game/index.html';
+                iframe.style.flex = '1';
+                iframe.style.border = 'none';
+                iframe.style.width = '100%';
+                iframe.style.background = '#000';
+                
+                header.appendChild(title);
+                header.appendChild(closeBtn);
+                modal.appendChild(header);
+                modal.appendChild(iframe);
+                document.body.appendChild(modal);
+            }
+        }
+    });
+
     // Handle Transitions
     const body = document.body;
     const aboutGateway = document.getElementById('planet-gateway');

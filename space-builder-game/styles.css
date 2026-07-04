@@ -1,0 +1,338 @@
+:root {
+    --bg-color: #03030a;
+    --color-cockpit: #00f0ff;
+    --color-block: #5a6b8c;
+    --color-wheel: #ff3366;
+    --color-thruster: #ffaa00;
+    --glass-bg: rgba(25, 30, 45, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.15);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-color);
+    color: white;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* No scrolling */
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+
+
+/* ================= WORKSPACE ================= */
+#workspace {
+    flex-grow: 1;
+    position: relative;
+    background-color: var(--bg-color);
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(255, 0, 234, 0.05) 0%, transparent 20%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#build-grid-container {
+    /* Set by JS to maintain aspect ratio */
+    position: relative;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#build-grid {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+}
+
+.trash-btn {
+    position: absolute;
+    right: -50px;
+    top: 0;
+    background: rgba(255, 51, 102, 0.2);
+    border: 1px solid rgba(255, 51, 102, 0.4);
+    border-radius: 8px;
+    font-size: 1.5rem;
+    padding: 8px 10px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all 0.2s;
+}
+
+.trash-btn:hover {
+    opacity: 1;
+    background: rgba(255, 51, 102, 0.5);
+    transform: scale(1.1);
+}
+
+.grid-cell {
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: crosshair;
+    transition: background 0.1s;
+}
+.grid-cell:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Parts classes */
+.cell-cockpit { background-color: var(--color-cockpit); box-shadow: inset 0 0 10px rgba(0,0,0,0.5); border: none; }
+.cell-block { background-color: var(--color-block); box-shadow: inset 0 0 10px rgba(0,0,0,0.5); border: none; }
+.cell-thruster-up { background-color: var(--color-thruster); clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); transform: scale(0.9); border: none; }
+.cell-thruster-right { background-color: var(--color-thruster); clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); transform: scale(0.9) rotate(90deg); border: none; }
+.cell-thruster-down { background-color: var(--color-thruster); clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); transform: scale(0.9) rotate(180deg); border: none; }
+.cell-thruster-left { background-color: var(--color-thruster); clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); transform: scale(0.9) rotate(270deg); border: none; }
+
+#game-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Event handling happens through Matter.js rendering here */
+}
+
+/* Overlays */
+.hidden {
+    display: none !important;
+}
+
+#message-overlay, #intro-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.85);
+    padding: 2rem 3rem;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    text-align: center;
+    backdrop-filter: blur(10px);
+    z-index: 20;
+}
+#message-overlay h2, #intro-overlay h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, #00f0ff, #0077ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+#intro-overlay h2 {
+    background: linear-gradient(90deg, #00f0ff, #0055ff);
+    -webkit-background-clip: text;
+}
+#intro-overlay p {
+    font-size: 1.2rem;
+    color: #ccc;
+}
+#btn-reset-level {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* ================= INVENTORY ================= */
+#inventory {
+    height: 120px;
+    background: var(--glass-bg);
+    border-top: 1px solid var(--glass-border);
+    flex-shrink: 0;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+}
+
+.inventory-left h3 {
+    font-size: 0.9rem;
+    color: #99aab5;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+}
+
+.inventory-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#level-indicator {
+    font-weight: 700;
+    color: #00f0ff;
+    letter-spacing: 1px;
+}
+
+#btn-play {
+    background: #ff3366;
+    border: 1px solid #ff3366;
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 6px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+}
+#btn-play:hover {
+    background: #ff5588;
+    box-shadow: 0 0 20px rgba(255, 51, 102, 0.6);
+}
+
+.parts-grid {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.part-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+.part-item:hover {
+    opacity: 0.8;
+}
+.part-item.selected {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.part-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    margin-bottom: 0.3rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+}
+
+.part-item.selected .part-icon {
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
+.cockpit-icon { background: var(--color-cockpit); box-shadow: inset 0 0 10px rgba(0,0,0,0.3), 0 0 10px var(--color-cockpit); }
+.block-icon { background: var(--color-block); }
+.thruster-icon { 
+    background: var(--color-thruster); 
+    clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+    box-shadow: 0 0 10px var(--color-thruster); 
+}
+.eraser-icon {
+    background: transparent;
+    border: 2px dashed #ff3366;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: none;
+}
+.eraser-icon::after {
+    content: "X";
+    color: #ff3366;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+
+/* --- UI Hints --- */
+.mini-keys {
+    display: flex;
+    gap: 2px;
+    margin-left: 8px;
+    align-items: center;
+}
+.mini-key {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 2px;
+    font-size: 10px;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+.big-keys {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin-top: 20px;
+}
+.key-row {
+    display: flex;
+    gap: 5px;
+}
+.key {
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(0, 240, 255, 0.8);
+    border-radius: 6px;
+    font-size: 24px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #00f0ff;
+    text-shadow: 0 0 10px #00f0ff;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.2);
+    font-weight: bold;
+}
+.key-label {
+    margin-top: 10px !important;
+    font-size: 14px !important;
+    color: #00f0ff !important;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+/* Cinematic Fade Transition */
+#transition-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #050b14;
+    z-index: 9999;
+    opacity: 1;
+    pointer-events: all;
+    transition: opacity 0.5s ease-in-out;
+}
+#transition-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    display: block !important;
+}
+
+/* Also give overlays a slight fade if we want */
+#intro-overlay, #message-overlay {
+    transition: opacity 0.3s ease;
+}
+#intro-overlay.hidden, #message-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    display: flex !important;
+}

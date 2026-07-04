@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Space Rover Builder v2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Middle Workspace (Dynamic Flex Grow) -->
+    <div id="transition-overlay" class="hidden"></div>
+    <main id="workspace">
+        <div id="build-grid-container">
+            <div id="build-grid"></div>
+            <button id="btn-clear" class="trash-btn" title="Clear Grid">🗑️</button>
+        </div>
+        <canvas id="game-canvas" class="hidden"></canvas>
+        
+        <!-- Interstitial Intro Overlay -->
+        <div id="intro-overlay" class="hidden">
+            <h2>Reach the end planet!</h2>
+            <div class="big-keys">
+                <div class="key-row"><div class="key">↑</div></div>
+                <div class="key-row"><div class="key">←</div><div class="key">↓</div><div class="key">→</div></div>
+                <p class="key-label">USE ARROW KEYS</p>
+            </div>
+        </div>
+        
+        <!-- Game Over / Win Overlay -->
+        <div id="message-overlay" class="hidden">
+            <h2 id="message-text">Goal Reached!</h2>
+            <button id="btn-reset-level">Back to Build Mode</button>
+        </div>
+    </main>
+
+    <!-- Bottom Inventory (Fixed Height) -->
+    <footer id="inventory">
+        <div class="inventory-left">
+            <h3>Inventory</h3>
+            <div class="parts-grid">
+                <div class="part-item selected" data-part="cockpit">
+                    <div class="part-icon cockpit-icon"></div>
+                    <span>Cockpit</span>
+                </div>
+                <div class="part-item" data-part="block">
+                    <div class="part-icon block-icon"></div>
+                    <span>Block</span>
+                </div>
+                <!-- Wheel removed for orbital gameplay -->
+                <div class="part-item" data-part="thruster-up" id="thruster-btn">
+                    <div class="part-icon thruster-icon" id="thruster-icon"></div>
+                    <span id="thruster-label">Thruster (Up)</span>
+                    <div class="part-hint" style="font-size: 8.5px; white-space: nowrap; color: #00f0ff; text-align: center; margin-top: 4px; font-weight: bold; text-shadow: 0 0 5px rgba(0,240,255,0.5); line-height: 1;">CLICK TO ROTATE</div>
+                </div>
+                <div class="part-item" data-part="eraser">
+                    <div class="part-icon eraser-icon"></div>
+                    <span>Eraser</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="inventory-right">
+            <div id="level-indicator">Level 1/5</div>
+            <button id="btn-play" class="btn-primary">LAUNCH</button>
+        </div>
+    </footer>
+
+    <script src="game.js"></script>
+</body>
+</html>

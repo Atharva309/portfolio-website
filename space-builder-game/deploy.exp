@@ -1,0 +1,15 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn npx surge ./ spacerover-builder.surge.sh
+expect {
+    "email:" {
+        send "sachin.antigravity@example.com\r"
+        expect "password:"
+        send "StrongPass123!\r"
+        exp_continue
+    }
+    "Success" {
+        exit 0
+    }
+    eof
+}
