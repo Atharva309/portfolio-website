@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rotSpeed: (Math.random() - 0.5) * 0.005,
         size: 150,
         isHovered: false,
-        wonShipGrid: null // Will store the gridMap array when game is won
+        wonShipGrid: sessionStorage.getItem('wonShipGrid') ? JSON.parse(sessionStorage.getItem('wonShipGrid')) : null
     };
 
     function drawCustomShip(ctx, gridMapArray, size, isHovered) {
@@ -353,6 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             
                             if (reconstructedGrid.length > 0) {
                                 astro.wonShipGrid = reconstructedGrid;
+                                sessionStorage.setItem('wonShipGrid', JSON.stringify(reconstructedGrid));
                             }
                             clearInterval(checkWinInterval);
                         }
