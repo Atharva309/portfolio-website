@@ -42,10 +42,11 @@ document.addEventListener('DOMContentLoaded', () => {
         rotSpeed: (Math.random() - 0.5) * 0.005,
         size: 150,
         isHovered: false,
+        glowIntensity: 0,
         wonShipGrid: sessionStorage.getItem('wonShipGrid') ? JSON.parse(sessionStorage.getItem('wonShipGrid')) : null
     };
 
-    function drawCustomShip(ctx, gridMapArray, size, isHovered) {
+    function drawCustomShip(ctx, gridMapArray, size, glowIntensity) {
         if (!gridMapArray || gridMapArray.length === 0) return;
         
         let minC = 999, maxC = -999, minR = 999, maxR = -999;
@@ -70,8 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Draw Gold Crown Hat on top
         const hatY = offsetY + minR * cellSize - cellSize * 0.8;
         ctx.fillStyle = '#ffd700'; // Gold
-        ctx.shadowBlur = isHovered ? 30 : 15;
-        ctx.shadowColor = isHovered ? 'cyan' : '#ffd700';
+        ctx.shadowBlur = 15 + 15 * glowIntensity;
+        ctx.shadowColor = glowIntensity > 0 ? `rgba(0, 255, 255, ${glowIntensity})` : '#ffd700';
         ctx.beginPath();
         ctx.moveTo(-cellSize*0.4, hatY + cellSize*0.2); // Bottom left
         ctx.lineTo(-cellSize*0.6, hatY - cellSize*0.4); // Top left point
@@ -101,8 +102,14 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (part === 'block') color = '#5a6b8c';
             
             ctx.fillStyle = color;
-            ctx.shadowBlur = isHovered ? 30 : 10;
-            ctx.shadowColor = isHovered ? 'cyan' : color;
+            ctx.shadowBlur = 10 + 20 * glowIntensity;
+            
+            // To avoid abrupt color switching, if there is glow, transition to cyan
+            if (glowIntensity > 0.1) {
+                ctx.shadowColor = `rgba(0, 255, 255, ${glowIntensity})`;
+            } else {
+                ctx.shadowColor = color;
+            }
 
             if (part === 'cockpit' || part === 'block') {
                 ctx.fillRect(-cellSize/2, -cellSize/2, cellSize, cellSize);
@@ -185,16 +192,19 @@ document.addEventListener('DOMContentLoaded', () => {
             // Floating bobbing effect
             const bobY = Math.sin(timeMs * 0.001) * 10;
             
-            if (astro.wonShipGrid) {
-                drawCustomShip(ctx, astro.wonShipGrid, astro.size * 0.9, astro.isHovered);
+            // Lerp glow intensity
+            if (astro.isHovered) {
+                astro.glowIntensity += (1.0 - astro.glowIntensity) * 0.05;
             } else {
-                if (astro.isHovered) {
-                    ctx.shadowBlur = 20;
-                    ctx.shadowColor = 'cyan';
-                } else {
-                    ctx.shadowBlur = 0;
-                    ctx.shadowColor = 'transparent';
-                }
+                astro.glowIntensity -= astro.glowIntensity * 0.05;
+            }
+            if (astro.glowIntensity < 0.001) astro.glowIntensity = 0;
+
+            if (astro.wonShipGrid) {
+                drawCustomShip(ctx, astro.wonShipGrid, astro.size * 0.9, astro.glowIntensity);
+            } else {
+                ctx.shadowBlur = 20 * astro.glowIntensity;
+                ctx.shadowColor = `rgba(0, 255, 255, ${astro.glowIntensity})`;
                 ctx.drawImage(astroImg, -astro.size/2, -astro.size/2 + bobY, astro.size, astro.size);
             }
             
