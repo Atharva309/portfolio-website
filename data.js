@@ -68,7 +68,7 @@ const projectsData = [
         techStack: ["YOLO", "ResNet", "MobileNet", "Computer Vision"],
         githubUrl: "https://github.com/Atharva309/TRASHCAM",
         liveUrl: "https://huggingface.co/spaces/atharva9/trashcam-app",
-        imageUrl: "https://raw.githubusercontent.com/Atharva309/TRASHCAM/main/docs/images/demoimg.png",
+        imageUrl: "https://media.githubusercontent.com/media/Atharva309/TRASHCAM/main/docs/images/demoimg.png",
         icon: "fas fa-trash-alt"
     },
     {
