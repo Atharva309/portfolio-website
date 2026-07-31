@@ -66,9 +66,9 @@ const projectsData = [
         shortDescription: "Classification of waste using image analysis (YOLO, ResNet, MobileNet).",
         fullDescription: "<p>An environmental computer vision pipeline that automatically sorts trash into recycling and waste categories using deep convolutional neural networks.</p><h3>Technical Implementation</h3><ul><li>Applied robust transfer learning across multiple state-of-the-art architectures including <strong>YOLO</strong>, <strong>ResNet</strong>, and <strong>MobileNet</strong>.</li><li>Fine-tuned the networks on custom waste datasets to achieve high real-time inference accuracy and rapid processing speeds.</li><li>Evaluated model precision and bounding box metrics for potential deployment in automated industrial sorting facilities.</li></ul>",
         techStack: ["YOLO", "ResNet", "MobileNet", "Computer Vision"],
-        githubUrl: "https://github.com/Atharva309/Waste_Classification",
+        githubUrl: "https://github.com/Atharva309/TRASHCAM",
         liveUrl: "https://huggingface.co/spaces/atharva9/trashcam-app",
-        imageUrl: "https://raw.githubusercontent.com/Atharva309/Waste_Classification/main/docs/images/demoimg.png",
+        imageUrl: "https://raw.githubusercontent.com/Atharva309/TRASHCAM/main/docs/images/demoimg.png",
         icon: "fas fa-trash-alt"
     },
     {
