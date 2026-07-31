@@ -64,14 +64,14 @@ const newData = `const projectsData = [
     },
     {
         id: "waste-classification",
-        title: "Waste Classification AI",
+        title: "Trashcam",
         category: "AI/ML",
         shortDescription: "Classification of waste using image analysis (YOLO, ResNet, MobileNet).",
         fullDescription: "<p>An environmental AI project utilizing transfer learning across multiple architectures (YOLO, ResNet, MobileNet) for automated trash sorting.</p>",
         techStack: ["YOLO", "ResNet", "MobileNet", "Computer Vision"],
         githubUrl: "https://github.com/Atharva309/Waste_Classification",
-        liveUrl: "",
-        imageUrl: "",
+        liveUrl: "https://huggingface.co/spaces/atharva9/trashcam-app",
+        imageUrl: "https://raw.githubusercontent.com/Atharva309/Waste_Classification/main/docs/images/demoimg.png",
         icon: "fas fa-trash-alt"
     },
     {
