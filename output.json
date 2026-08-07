@@ -28,6 +28,47 @@
     },
     "experience": [
         {
+            "company": "University of Colorado Boulder",
+            "role": "Temporary Post Graduate Assistant",
+            "duration": "Jul 2026 - Present",
+            "workstreams": [
+                {
+                    "name": "Live AI Persona Simulation (used in Sales platform)",
+                    "tools": [
+                        "GPT-4o",
+                        "Speech-to-Text",
+                        "Text-to-Speech",
+                        "Prompt Engineering",
+                        "Behavioral State Design"
+                    ],
+                    "bullets": [
+                        "Designed two distinct LLM persona specifications for real-time voice-based role-play, defining behavioral rules that vary response depth and information disclosure based on live conversational input quality",
+                        "Built escalation/de-escalation logic so personas harden under evasive or pushy questions and open up in response to well-structured ones, producing consequential rather than scripted dialogue",
+                        "Engineered speech-to-text -> LLM -> text-to-speech pipeline for natural, low-latency spoken conversation, tuning pacing and turn-taking distinct from text-based interaction",
+                        "Wrote stage-specific system prompts governing persona tone, disclosure boundaries, and escalation triggers, validated through iterative live testing"
+                    ]
+                },
+                {
+                    "name": "AI-Powered Sales Training Platform",
+                    "tools": [
+                        "GPT-4o / GPT-4o-mini",
+                        "PostgreSQL (Supabase)",
+                        "Row-Level Security",
+                        "Next.js",
+                        "Prompt Engineering",
+                        "Synthetic Data Generation"
+                    ],
+                    "bullets": [
+                        "Architected a 5-stage sales simulation platform with automated LLM-based grading, translating qualitative rubric criteria into structured, machine-scorable evaluation prompts across 28 distinct behavioral checks",
+                        "Built a config-driven synthetic dataset generator with a generalized multi-axis comparison engine, programmatically enforcing that no generated entity could out-rank a canonical target on more than one measurable dimension",
+                        "Designed a grounded AI research assistant restricted to verified per-entity data, engineering anti-injection and anti-leakage safeguards to prevent the model from revealing scoring-relevant information",
+                        "Implemented Row-Level Security across a multi-table schema to enforce data isolation between concurrent user sessions",
+                        "Directed implementation through an AI coding assistant as technical lead, writing scoped specifications and conducting evidence-based audits to reconcile intended design against actual runtime behavior across a fast-iterating codebase"
+                    ]
+                }
+            ]
+        },
+        {
             "company": "Projxon",
             "role": "AI Specialist Intern",
             "duration": "Aug 2025 - May 2026",
