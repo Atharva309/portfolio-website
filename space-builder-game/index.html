@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Space Rover Builder v2</title>
+    <title>Homeward | Ship Builder</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link rel="stylesheet" href="styles.css">
@@ -20,63 +20,149 @@
 </script>
 </head>
 <body>
-    <!-- Middle Workspace (Dynamic Flex Grow) -->
-    <div id="transition-overlay" class="hidden"></div>
-    <main id="workspace">
-        <div id="build-grid-container">
-            <div id="build-grid"></div>
-            <button id="btn-clear" class="trash-btn" title="Clear Grid">🗑️</button>
-        </div>
-        <canvas id="game-canvas" class="hidden"></canvas>
-        
-        <!-- Interstitial Intro Overlay -->
-        <div id="intro-overlay" class="hidden">
-            <h2>Reach the end planet!</h2>
-            <div class="big-keys">
-                <div class="key-row"><div class="key">↑</div></div>
-                <div class="key-row"><div class="key">←</div><div class="key">↓</div><div class="key">→</div></div>
-                <p class="key-label">USE ARROW KEYS</p>
-            </div>
-        </div>
-        
-        <!-- Game Over / Win Overlay -->
-        <div id="message-overlay" class="hidden">
-            <h2 id="message-text">Goal Reached!</h2>
-            <button id="btn-reset-level">Back to Build Mode</button>
-        </div>
-    </main>
+    <!-- Space background and the flight view -->
+    <canvas id="game-canvas"></canvas>
 
-    <!-- Bottom Inventory (Fixed Height) -->
-    <footer id="inventory">
-        <div class="inventory-left">
-            <h3>Inventory</h3>
-            <div class="parts-grid">
-                <div class="part-item selected" data-part="cockpit">
-                    <div class="part-icon cockpit-icon"></div>
-                    <span>Cockpit</span>
+    <!-- Level select -->
+    <section id="screen-menu" class="screen">
+        <div class="menu-inner">
+            <p class="eyebrow">Ship builder</p>
+            <h1 class="title">Homeward</h1>
+            <p class="subtitle">Build a ship. Fly it through five sectors. Get back to Earth.</p>
+            <div id="level-list" class="level-list"></div>
+            <p class="menu-foot">Your ship carries over between levels, so tweak it as you go.</p>
+        </div>
+        <button id="btn-sound-menu" class="icon-btn sound-btn" title="Sound">♪</button>
+    </section>
+
+    <!-- Build mode -->
+    <section id="screen-build" class="screen hidden">
+        <header class="topbar">
+            <button id="btn-levels" class="ghost-btn">← Levels</button>
+            <div class="topbar-title">
+                <span id="level-indicator">Level 1/5</span>
+                <span id="level-name">First Light</span>
+            </div>
+            <button id="btn-sound" class="icon-btn sound-btn" title="Sound">♪</button>
+        </header>
+
+        <div class="build-layout">
+            <aside class="panel parts-panel">
+                <h3 class="panel-title">Parts</h3>
+                <div id="parts-list" class="parts-list"></div>
+                <p class="panel-hint">Pick a part, then click or drag on the grid. Right-click erases. Click a picked part again (or press R) to turn it.</p>
+            </aside>
+
+            <div class="grid-area">
+                <div class="grid-tools">
+                    <button id="btn-rotate" class="tool-btn" title="Turn part (R)">↻ Turn</button>
+                    <button id="btn-mirror" class="tool-btn" title="Mirror building (M)">⇋ Mirror</button>
+                    <button id="btn-starter" class="tool-btn" title="Load a starter ship">✦ Starter ship</button>
+                    <button id="btn-clear" class="tool-btn danger" title="Clear the grid">Clear</button>
                 </div>
-                <div class="part-item" data-part="block">
-                    <div class="part-icon block-icon"></div>
-                    <span>Block</span>
+                <div id="build-grid-container">
+                    <div id="build-grid"></div>
+                    <canvas id="ghost-part" class="ghost-part hidden"></canvas>
                 </div>
-                <!-- Wheel removed for orbital gameplay -->
-                <div class="part-item" data-part="thruster-up" id="thruster-btn">
-                    <div class="part-icon thruster-icon" id="thruster-icon"></div>
-                    <span id="thruster-label">Thruster (Up)</span>
-                    <div class="part-hint" style="font-size: 8.5px; white-space: nowrap; color: #00f0ff; text-align: center; margin-top: 4px; font-weight: bold; text-shadow: 0 0 5px rgba(0,240,255,0.5); line-height: 1;">CLICK TO ROTATE</div>
+                <p id="build-warning" class="build-warning"></p>
+            </div>
+
+            <aside class="panel mission-panel">
+                <div class="mission">
+                    <p class="eyebrow">Mission</p>
+                    <h2 id="mission-name">First Light</h2>
+                    <p id="mission-brief" class="mission-brief"></p>
+                    <div id="mission-hazards" class="chips"></div>
                 </div>
-                <div class="part-item" data-part="eraser">
-                    <div class="part-icon eraser-icon"></div>
-                    <span>Eraser</span>
+                <div id="ship-stats" class="stats"></div>
+                <button id="btn-play" class="btn-launch">Launch</button>
+            </aside>
+        </div>
+    </section>
+
+    <!-- Flight HUD -->
+    <section id="screen-hud" class="screen hidden">
+        <div class="hud-top">
+            <div class="hud-card hud-status">
+                <div class="meter">
+                    <span class="meter-label">Hull</span>
+                    <div class="meter-bar"><div id="hull-fill" class="meter-fill hull"></div></div>
+                </div>
+                <div class="meter">
+                    <span class="meter-label">Fuel</span>
+                    <div class="meter-bar"><div id="fuel-fill" class="meter-fill fuel"></div></div>
                 </div>
             </div>
+            <div class="hud-card hud-center">
+                <span id="hud-level">Level 1 · First Light</span>
+                <span id="hud-time">0:00</span>
+            </div>
+            <div class="hud-right">
+                <div class="hud-card hud-stars" title="Star fragments">
+                    <svg viewBox="0 0 92 30" class="constellation" aria-hidden="true">
+                        <line class="c-line" id="hud-line-1" x1="14" y1="19" x2="46" y2="9"/>
+                        <line class="c-line" id="hud-line-2" x1="46" y1="9" x2="78" y2="20"/>
+                        <path class="c-star" id="hud-star-0" transform="translate(14 19)" d="M0 -8 L2 -2 L8 0 L2 2 L0 8 L-2 2 L-8 0 L-2 -2 Z"/>
+                        <path class="c-star" id="hud-star-1" transform="translate(46 9)" d="M0 -8 L2 -2 L8 0 L2 2 L0 8 L-2 2 L-8 0 L-2 -2 Z"/>
+                        <path class="c-star" id="hud-star-2" transform="translate(78 20)" d="M0 -8 L2 -2 L8 0 L2 2 L0 8 L-2 2 L-8 0 L-2 -2 Z"/>
+                    </svg>
+                </div>
+                <button id="btn-pause" class="icon-btn" title="Pause (Esc)">❚❚</button>
+            </div>
         </div>
-        
-        <div class="inventory-right">
-            <div id="level-indicator">Level 1/5</div>
-            <button id="btn-play" class="btn-primary">LAUNCH</button>
+        <canvas id="minimap" class="minimap"></canvas>
+        <div id="toast" class="toast"></div>
+        <p id="controls-hint" class="controls-hint">Arrows / WASD thrust · Q E turn · Space fire · R retry</p>
+        <div id="touch-controls" class="touch-controls">
+            <div class="dpad">
+                <button class="touch-btn" data-dir="up">▲</button>
+                <button class="touch-btn" data-dir="left">◀</button>
+                <button class="touch-btn" data-dir="down">▼</button>
+                <button class="touch-btn" data-dir="right">▶</button>
+            </div>
+            <div class="actions">
+                <button class="touch-btn small" data-act="rotL">↺</button>
+                <button class="touch-btn small" data-act="rotR">↻</button>
+                <button class="touch-btn fire" data-act="fire">Fire</button>
+            </div>
         </div>
-    </footer>
+    </section>
+
+    <!-- Countdown before lift off -->
+    <div id="countdown" class="overlay hidden">
+        <div class="overlay-card countdown-card">
+            <p class="eyebrow" id="countdown-goal">Reach the wormhole</p>
+            <div id="countdown-number" class="countdown-number">3</div>
+            <div id="countdown-controls" class="countdown-controls"></div>
+        </div>
+    </div>
+
+    <!-- Pause -->
+    <div id="pause-overlay" class="overlay hidden">
+        <div class="overlay-card">
+            <p class="eyebrow">Paused</p>
+            <h2>Take a breath</h2>
+            <div class="overlay-buttons">
+                <button id="btn-resume" class="btn-primary">Resume</button>
+                <button id="btn-restart" class="btn-secondary">Restart flight</button>
+                <button id="btn-rebuild" class="btn-secondary">Rebuild ship</button>
+                <button id="btn-quit" class="btn-secondary">Levels</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Level result (the home page watches #message-text for "GALAXY SAVED!") -->
+    <div id="message-overlay" class="overlay hidden">
+        <div class="overlay-card">
+            <p class="eyebrow" id="message-eyebrow"></p>
+            <h2 id="message-text"></h2>
+            <div id="message-stars" class="result-stars"></div>
+            <p id="message-detail" class="message-detail"></p>
+            <div id="message-buttons" class="overlay-buttons"></div>
+        </div>
+    </div>
+
+    <div id="transition-overlay" class="hidden"></div>
 
     <script src="game.js"></script>
 </body>
