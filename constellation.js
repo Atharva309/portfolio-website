@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Each section: project list, with a small constellation on its right (above it on narrow screens)
     const sideBySide = window.innerWidth >= 1000;
-    const listWidth = window.innerWidth >= 1280 ? 400 : (sideBySide ? 320 : Math.min(560, window.innerWidth - 32));
+    const listWidth = window.innerWidth >= 1280 ? 480 : (sideBySide ? 380 : Math.min(560, window.innerWidth - 32));
     const listThemes = ['180, 140, 255', '0, 255, 255', '255, 69, 0']; // Match star colors
     const sectionLayouts = [];
     let listHoverStar = null;
@@ -367,6 +367,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 const item = document.createElement('a');
                 item.className = 'constellation-list-item';
                 item.href = projectUrl(star);
+
+                // Thumbnail: small local copy, then the full image, then a "No image" tile
+                const thumb = document.createElement('span');
+                thumb.className = 'constellation-list-thumb';
+                const showNoImage = () => {
+                    thumb.classList.add('is-empty');
+                    thumb.innerHTML = '<i class="far fa-image"></i><span>No image</span>';
+                };
+                if (star.project.imageUrl) {
+                    const img = document.createElement('img');
+                    img.src = `assets/thumbs/${star.project.id}.jpg`;
+                    img.alt = '';
+                    img.loading = 'lazy';
+                    img.decoding = 'async';
+                    let triedFullImage = false;
+                    img.addEventListener('error', () => {
+                        if (!triedFullImage) {
+                            triedFullImage = true;
+                            img.src = star.project.imageUrl;
+                        } else {
+                            showNoImage();
+                        }
+                    });
+                    thumb.appendChild(img);
+                } else {
+                    showNoImage();
+                }
+                item.appendChild(thumb);
 
                 const text = document.createElement('span');
                 text.className = 'constellation-list-text';
