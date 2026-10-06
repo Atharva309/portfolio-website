@@ -465,9 +465,11 @@ document.addEventListener('DOMContentLoaded', () => {
             let centerX, centerY, listTop;
 
             if (sideBySide) {
-                // List centered under the title, constellation vertically centered on its right
+                // List centered under the title, constellation vertically centered beside it, on the
+                // side away from the section's background planet/rocket/nebula (right on even sections, see draw())
                 const bandH = Math.max(listH, miniR * 2);
-                centerX = listLeft + listWidth + 70 + miniR;
+                const decorOnRight = index % 2 === 0;
+                centerX = decorOnRight ? listLeft - 70 - miniR : listLeft + listWidth + 70 + miniR;
                 centerY = contentTop + bandH / 2;
                 listTop = contentTop;
             } else {
@@ -723,7 +725,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const rgb = listThemes[currentHover.colorTheme % listThemes.length];
             const canvasRect = canvas.getBoundingClientRect();
             const itemRect = currentHover.listItem.getBoundingClientRect();
-            const sx = currentHover.listWrap.getBoundingClientRect().right - canvasRect.left;
+            const listRect = currentHover.listWrap.getBoundingClientRect();
+            const starOnLeft = currentHover.x < listRect.left - canvasRect.left;
+            const sx = (starOnLeft ? listRect.left : listRect.right) - canvasRect.left;
             const sy = itemRect.top + itemRect.height / 2 - canvasRect.top;
             const ex = sx + (currentHover.x - sx) * threadProgress;
             const ey = sy + (currentHover.y - sy) * threadProgress;
