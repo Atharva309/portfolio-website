@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // On wide screens, shift each constellation left and list its projects on the right
     const showProjectList = !isMobileLayout && window.innerWidth >= 1000;
     const listGap = 320; // Distance from constellation center to the list (star spread + breathing room)
-    const listWidth = 320;
+    const listWidth = window.innerWidth >= 1280 ? 400 : 320; // Wider where there's room, so descriptions fit
     const listThemes = ['180, 140, 255', '0, 255, 255', '255, 69, 0']; // Match star/tooltip colors
     let listHoverStar = null;
     let activeListItem = null;
@@ -360,13 +360,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.className = 'constellation-list-item';
                 item.href = projectUrl(star);
 
+                const text = document.createElement('span');
+                text.className = 'constellation-list-text';
+
+                const titleRow = document.createElement('span');
+                titleRow.className = 'constellation-list-title';
+
                 const label = document.createElement('span');
                 label.textContent = star.project.title;
-                item.appendChild(label);
+                titleRow.appendChild(label);
 
                 const arrow = document.createElement('i');
                 arrow.className = 'fas fa-arrow-right';
-                item.appendChild(arrow);
+                titleRow.appendChild(arrow);
+                text.appendChild(titleRow);
+
+                if (star.project.shortDescription) {
+                    const desc = document.createElement('span');
+                    desc.className = 'constellation-list-desc';
+                    desc.innerHTML = star.project.shortDescription; // Same source as the quick view
+                    text.appendChild(desc);
+                }
+                item.appendChild(text);
 
                 const show = () => { if (!isWarping) listHoverStar = star; };
                 const hide = () => { if (listHoverStar === star) listHoverStar = null; };
