@@ -6,19 +6,24 @@ document.addEventListener('DOMContentLoaded', () => {
     let width, height;
     
     const tooltip = document.getElementById('star-tooltip');
-    const tooltipTitle = document.getElementById('tooltip-title');
-    const tooltipCategory = document.getElementById('tooltip-category');
-    const tooltipImage = document.getElementById('tooltip-image');
-    const tooltipDesc = document.getElementById('tooltip-desc');
 
     let numCategories = 1; // Will be updated when data is parsed
+
+    // Small constellations: star spread and star size relative to the original full-size ones
+    const starScale = window.innerWidth >= 1000 ? 0.35 : 0.3;
+    const starSize = 0.6;
+    const starHitRadius = 30 * starSize;
+    const miniR = (260 + 35) * starScale + 5; // Furthest a star reaches from its constellation center
+    let sectionHeight = 0; // Set by layoutSections()
+    let layoutBottom = 0;
 
     function resize() {
         width = window.innerWidth;
         const isMobile = width <= 768;
         const topPadding = isMobile ? 1.5 : 1.2;
         // Make canvas height scale exactly to fit the last constellation, without massive empty space
-        height = window.innerHeight * (numCategories - 1 + topPadding + 0.6);
+        const sectionH = sectionHeight || window.innerHeight;
+        height = Math.max(window.innerHeight * (topPadding + 0.6) + (numCategories - 1) * sectionH, layoutBottom);
         canvas.width = width;
         canvas.height = height;
         
@@ -228,21 +233,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Distribute centers vertically
     const isMobileLayout = window.innerWidth <= 768;
     const spacingCoef = isMobileLayout ? 1.5 : 1.2;
+    const titleOffset = isMobileLayout ? 250 : 350;
 
-    // On wide screens, shift each constellation left and list its projects on the right
-    const showProjectList = !isMobileLayout && window.innerWidth >= 1000;
-    const listGap = 320; // Distance from constellation center to the list (star spread + breathing room)
-    const listWidth = window.innerWidth >= 1280 ? 400 : 320; // Wider where there's room, so descriptions fit
-    const listThemes = ['180, 140, 255', '0, 255, 255', '255, 69, 0']; // Match star/tooltip colors
+    // Each section: project list, with a small constellation on its right (above it on narrow screens)
+    const sideBySide = window.innerWidth >= 1000;
+    const listWidth = window.innerWidth >= 1280 ? 400 : (sideBySide ? 320 : Math.min(560, window.innerWidth - 32));
+    const listThemes = ['180, 140, 255', '0, 255, 255', '255, 69, 0']; // Match star colors
+    const sectionLayouts = [];
     let listHoverStar = null;
     let activeListItem = null;
+    let threadProgress = 0;
+    let threadStar = null;
+
+    const section = document.getElementById('constellation-section');
 
     categoryNames.forEach((cat, index) => {
-        const centerX = showProjectList ? (width - (listGap * 2 + listWidth)) / 2 + listGap : width / 2;
-        const centerY = (index + spacingCoef) * window.innerHeight; // Pushed further down
-        
+        let titleEl = null;
+
         // Inject HTML Title for this category
-        const section = document.getElementById('constellation-section');
         if (section) {
             if (index === 0) {
                 // Inject the main title block above the first constellation
@@ -264,16 +272,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 section.appendChild(mainTitle);
             }
 
-            const titleEl = document.createElement('h3');
+            titleEl = document.createElement('h3');
             titleEl.textContent = cat;
             titleEl.style.position = 'absolute';
-            titleEl.style.top = `${(index + spacingCoef) * window.innerHeight - (isMobileLayout ? 250 : 350)}px`; // Extra clearance
             titleEl.style.left = '50%';
             titleEl.style.transform = 'translateX(-50%)';
             // Define colors matching the background planets
             const themeColors = ['#b48cff', '#64b4ff', '#ff6482'];
             const titleColor = themeColors[index % themeColors.length];
-            
+
             titleEl.style.fontSize = '2.5rem';
             titleEl.style.color = titleColor;
             titleEl.style.textShadow = `0 0 15px ${titleColor}`;
@@ -282,37 +289,40 @@ document.addEventListener('DOMContentLoaded', () => {
             titleEl.style.animation = 'uiFadeInCenter 1.2s ease-out 0.8s both'; // Fades in slowly while keeping -50% translateX
             section.appendChild(titleEl);
         }
-        
+
+        // Stars are placed around (0, 0) here and moved into position by layoutSections()
         const catStars = [];
         categories[cat].forEach((project, pIndex) => {
             let placed = false;
             let x, y;
             let attempts = 0;
-            
+
             while (!placed && attempts < 150) {
                 const angle = Math.random() * Math.PI * 2;
-                const radius = 60 + Math.random() * 200; // Increased constellation size
-                x = centerX + Math.cos(angle) * radius;
-                y = centerY + Math.sin(angle) * radius;
-                
+                const radius = (60 + Math.random() * 200) * starScale;
+                x = Math.cos(angle) * radius;
+                y = Math.sin(angle) * radius;
+
                 // Ensure stars aren't too close to each other
                 let tooClose = false;
-                for (let i = 0; i < constellations.length; i++) {
-                    const other = constellations[i];
-                    const dist = Math.sqrt(Math.pow(x - other.x, 2) + Math.pow(y - other.y, 2));
-                    if (dist < 45) { // Minimum 45px distance between any two stars
+                for (let i = 0; i < catStars.length; i++) {
+                    const other = catStars[i];
+                    const dist = Math.sqrt(Math.pow(x - other.relX, 2) + Math.pow(y - other.relY, 2));
+                    if (dist < 40 * starSize) {
                         tooClose = true;
                         break;
                     }
                 }
-                
+
                 if (!tooClose) {
                     placed = true;
                 }
                 attempts++;
             }
-            
+
             const star = {
+                relX: x,
+                relY: y,
                 originalAnchorX: x,
                 originalAnchorY: y,
                 anchorX: x,
@@ -326,10 +336,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 driftOffsetY: Math.random() * Math.PI * 2,
                 driftSpeedX: 0.0003 + Math.random() * 0.0004,
                 driftSpeedY: 0.0003 + Math.random() * 0.0004,
-                driftRadius: 15 + Math.random() * 20, // Drift within 15-35px radius
+                driftRadius: (15 + Math.random() * 20) * starScale,
                 twinkleOffset: Math.random() * Math.PI * 2,
-                baseRadius: 10 + Math.random() * 6,
-                currentRadius: 10,
+                baseRadius: (10 + Math.random() * 6) * starSize,
+                currentRadius: 10 * starSize,
                 project: project,
                 category: cat
             };
@@ -337,13 +347,11 @@ document.addEventListener('DOMContentLoaded', () => {
             catStars.push(star);
         });
 
-        // Project list beside the constellation; hovering an item opens that star's quick view
-        if (showProjectList && section) {
-            const listLeft = centerX + listGap;
-            const listWrap = document.createElement('div');
+        // Project list; hovering an item spotlights it and links it to its star
+        let listWrap = null;
+        if (section) {
+            listWrap = document.createElement('div');
             listWrap.className = 'constellation-list';
-            listWrap.style.top = `${centerY}px`;
-            listWrap.style.left = `${listLeft}px`;
             listWrap.style.width = `${listWidth}px`;
             listWrap.style.setProperty('--accent-rgb', listThemes[index % listThemes.length]);
 
@@ -378,16 +386,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (star.project.shortDescription) {
                     const desc = document.createElement('span');
                     desc.className = 'constellation-list-desc';
-                    desc.innerHTML = star.project.shortDescription; // Same source as the quick view
+                    desc.innerHTML = star.project.shortDescription;
                     text.appendChild(desc);
                 }
                 item.appendChild(text);
 
                 const show = () => { if (!isWarping) listHoverStar = star; };
-                const hide = () => { if (listHoverStar === star) listHoverStar = null; };
-                item.addEventListener('mouseenter', show);
+                const hide = () => { if (!isWarping && listHoverStar === star) listHoverStar = null; };
+                // Mouse only: on touch screens a tap goes straight to the click below
+                item.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') show(); });
+                item.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') hide(); });
                 item.addEventListener('focus', show);
-                item.addEventListener('mouseleave', hide);
                 item.addEventListener('blur', hide);
                 item.addEventListener('click', (e) => {
                     // Let cmd/ctrl/shift-click open the project in a new tab as usual
@@ -397,19 +406,82 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 star.listItem = item;
-                star.listLeft = listLeft;
+                star.listWrap = listWrap;
                 inner.appendChild(item);
             });
 
             listWrap.appendChild(inner);
             section.appendChild(listWrap);
         }
+
+        sectionLayouts.push({ titleEl, listWrap, stars: catStars });
     });
 
+    // Size sections so the tallest list fits, then place each title, list and constellation
+    function layoutSections() {
+        const contentHeight = (l) => {
+            const listH = l.listWrap ? l.listWrap.offsetHeight : 0;
+            return sideBySide ? Math.max(listH, miniR * 2) : miniR * 2 + 12 + listH;
+        };
+        const titleHeight = (l) => (l.titleEl ? l.titleEl.offsetHeight : 64);
+
+        sectionHeight = Math.max(window.innerHeight, ...sectionLayouts.map(l => titleHeight(l) + 16 + contentHeight(l) + 90));
+        layoutBottom = 0;
+        const titleTops = [];
+
+        sectionLayouts.forEach((l, index) => {
+            const titleTop = spacingCoef * window.innerHeight + index * sectionHeight - titleOffset;
+            const contentTop = titleTop + titleHeight(l) + 16;
+            const listH = l.listWrap ? l.listWrap.offsetHeight : 0;
+            const listLeft = (width - listWidth) / 2;
+            let centerX, centerY, listTop;
+
+            if (sideBySide) {
+                // List centered under the title, constellation to its right.
+                // Even sections have their planet/nebula at the top right (see draw()), so sit below it there.
+                const bandH = Math.max(listH, miniR * 2);
+                centerX = listLeft + listWidth + 70 + miniR;
+                centerY = index % 2 === 0 ? contentTop + bandH - miniR : contentTop + bandH / 2;
+                listTop = contentTop;
+            } else {
+                // Constellation above the list, on its right (clear of the side nav buttons)
+                centerX = listLeft + listWidth - miniR;
+                centerY = contentTop + miniR;
+                listTop = contentTop + miniR * 2 + 12;
+            }
+
+            if (l.titleEl) l.titleEl.style.top = `${titleTop}px`;
+            if (l.listWrap) {
+                l.listWrap.style.top = `${listTop}px`;
+                l.listWrap.style.left = `${listLeft}px`;
+            }
+            l.stars.forEach(star => {
+                star.originalAnchorX = star.anchorX = star.x = centerX + star.relX;
+                star.originalAnchorY = star.anchorY = star.y = centerY + star.relY;
+            });
+
+            titleTops.push(titleTop);
+            layoutBottom = Math.max(layoutBottom, contentTop + contentHeight(l) + 90);
+        });
+
+        window.constellationTitleTops = titleTops; // Used by the side nav buttons to scroll to each section
+        resize();
+    }
+
+    layoutSections();
+    // Web fonts can change list heights once loaded
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutSections);
+
     function setActiveListItem(star) {
-        if (activeListItem) activeListItem.classList.remove('active');
+        if (activeListItem) {
+            activeListItem.classList.remove('active');
+            activeListItem.parentElement.classList.remove('has-active');
+        }
         activeListItem = star && star.listItem ? star.listItem : null;
-        if (activeListItem) activeListItem.classList.add('active');
+        if (activeListItem) {
+            activeListItem.classList.add('active');
+            activeListItem.parentElement.classList.add('has-active');
+        }
     }
 
     // Background stars
@@ -473,6 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function warpToStar(star) {
         isWarping = true;
         clickedStarRef = star;
+        listHoverStar = star; // Keep the project spotlighted while warping (the feedback for a tap on phones)
         warpRadius = 0;
         document.body.style.pointerEvents = 'none'; // disable clicks during warp
         tooltip.style.opacity = '0';
@@ -483,9 +556,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800);
     }
 
-    canvas.addEventListener('click', () => {
-        if (hoveredStar && !isWarping) {
-            warpToStar(hoveredStar);
+    function starAt(x, y) {
+        return constellations.find(star => Math.hypot(x - star.x, y - star.y) < starHitRadius) || null;
+    }
+
+    canvas.addEventListener('click', (e) => {
+        // Hit-test at the click itself so a single tap works on touch screens
+        const rect = canvas.getBoundingClientRect();
+        const star = starAt(e.clientX - rect.left, e.clientY - rect.top);
+        if (star && !isWarping) {
+            warpToStar(star);
         }
     });
 
@@ -510,7 +590,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const renderSpacing = isMobileRender ? 1.4 : 1.1;
 
         for (let i = 0; i < numCategories; i++) {
-            const planetY = (i + renderSpacing) * window.innerHeight + currentParallaxY * 2;
+            const planetY = renderSpacing * window.innerHeight + i * (sectionHeight || window.innerHeight) + currentParallaxY * 2;
             const planetX = (i % 2 === 0 ? width * 0.8 : width * 0.2) + currentParallaxX * 2;
             
             if (i === 1) {
@@ -550,8 +630,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         constellations.forEach(star => {
             // Organic drifting logic
-            let drawX = star.anchorX + Math.sin(timeMs * star.driftSpeedX + star.driftOffsetX) * star.driftRadius + currentParallaxX * 12;
-            let drawY = star.anchorY + Math.cos(timeMs * star.driftSpeedY + star.driftOffsetY) * star.driftRadius + currentParallaxY * 12;
+            let drawX = star.anchorX + Math.sin(timeMs * star.driftSpeedX + star.driftOffsetX) * star.driftRadius + currentParallaxX * 12 * starScale;
+            let drawY = star.anchorY + Math.cos(timeMs * star.driftSpeedY + star.driftOffsetY) * star.driftRadius + currentParallaxY * 12 * starScale;
             
             star.x = drawX;
             star.y = drawY;
@@ -561,7 +641,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const dy = mouseY - star.y;
             const dist = Math.sqrt(dx*dx + dy*dy);
             
-            if (dist < 30 || star === listHoverStar) {
+            if (dist < starHitRadius || star === listHoverStar) {
                 currentHover = star;
                 star.currentRadius = star.baseRadius * 1.5;
             } else {
@@ -572,7 +652,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (listHoverStar) currentHover = listHoverStar;
 
         // Draw connecting lines for same categories
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2 * starSize;
         const activeFilter = window.constellationFilter || 'all';
 
         for (let i = 0; i < constellations.length; i++) {
@@ -587,7 +667,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const dy = constellations[i].y - constellations[j].y;
                     const dist = Math.sqrt(dx*dx + dy*dy);
                     
-                    let alpha = Math.max(0.03, 0.6 - (dist / 400));
+                    let alpha = Math.max(0.03, 0.6 - (dist / starScale / 400)); // Same look as the full-size constellation
                     
                     if (category === 'AI/ML') {
                         ctx.strokeStyle = `rgba(150, 140, 255, ${alpha + 0.1})`;
@@ -606,14 +686,50 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // Spotlight thread: a glowing line drawn from the hovered list item to its star (side-by-side layout)
+        if (currentHover && sideBySide && currentHover.listItem) {
+            if (threadStar !== currentHover) {
+                threadStar = currentHover;
+                threadProgress = 0;
+            }
+            threadProgress += (1 - threadProgress) * 0.12;
+            const rgb = listThemes[currentHover.colorTheme % listThemes.length];
+            const canvasRect = canvas.getBoundingClientRect();
+            const itemRect = currentHover.listItem.getBoundingClientRect();
+            const sx = currentHover.listWrap.getBoundingClientRect().right - canvasRect.left;
+            const sy = itemRect.top + itemRect.height / 2 - canvasRect.top;
+            const ex = sx + (currentHover.x - sx) * threadProgress;
+            const ey = sy + (currentHover.y - sy) * threadProgress;
+
+            const threadGrad = ctx.createLinearGradient(sx, sy, ex, ey);
+            threadGrad.addColorStop(0, `rgba(${rgb}, 0.15)`);
+            threadGrad.addColorStop(1, `rgba(${rgb}, 0.9)`);
+            ctx.save();
+            ctx.strokeStyle = threadGrad;
+            ctx.lineWidth = 1.5;
+            ctx.shadowColor = `rgba(${rgb}, 0.8)`;
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.moveTo(sx, sy);
+            ctx.lineTo(ex, ey);
+            ctx.stroke();
+            ctx.fillStyle = `rgba(${rgb}, 0.9)`;
+            ctx.beginPath();
+            ctx.arc(sx, sy, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
         // Draw stars
         constellations.forEach(star => {
             // Dim if filtered out
             const isDimmed = activeFilter !== 'all' && star.category !== activeFilter;
-            
+            // Fade the other stars of a spotlighted constellation
+            const isOutOfSpotlight = currentHover && star !== currentHover && star.category === currentHover.category;
+
             // Subtle twinkle effect
             const twinkle = Math.sin(time + star.twinkleOffset) * 0.3 + 0.7; // oscillates between 0.4 and 1.0
-            ctx.globalAlpha = isDimmed ? 0.1 : twinkle;
+            ctx.globalAlpha = isDimmed ? 0.1 : (isOutOfSpotlight ? twinkle * 0.45 : twinkle);
             
             if (star.category === 'AI/ML') {
                 ctx.fillStyle = '#968CFF'; // Brighter purple
@@ -626,15 +742,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.shadowColor = '#FF4500';
             }
             
-            ctx.shadowBlur = isDimmed ? 0 : 25;
-            
+            ctx.shadowBlur = isDimmed ? 0 : 25 * starSize;
+
             // Draw 4-point star flare
             drawStarShape(ctx, star.x, star.y, 4, star.currentRadius * 1.5, star.currentRadius * 0.3);
             ctx.fill();
-            
+
             ctx.shadowBlur = 0; // reset
             ctx.globalAlpha = 1.0; // reset
         });
+
+        // Soft pulse ring around the spotlighted star
+        if (currentHover) {
+            const rgb = listThemes[currentHover.colorTheme % listThemes.length];
+            const t = (timeMs % 1600) / 1600;
+            ctx.beginPath();
+            ctx.arc(currentHover.x, currentHover.y, currentHover.currentRadius * (1.4 + t * 2.2), 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(${rgb}, ${0.7 * (1 - t)})`;
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+        }
 
         // Geometric expanding pulse on click
         if (isWarping && clickedStarRef) {
@@ -682,56 +809,16 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.restore();
         }
 
-        // Handle tooltip
+        // Spotlight the hovered star's project in the list (the old floating quick view is no longer shown)
         if (currentHover) {
             if (hoveredStar !== currentHover) {
                 hoveredStar = currentHover;
-                tooltipTitle.textContent = hoveredStar.project.title;
-                tooltipCategory.textContent = hoveredStar.project.category;
-                if (tooltipDesc) tooltipDesc.innerHTML = hoveredStar.project.shortDescription;
-                
-                if (tooltipImage) {
-                    if (hoveredStar.project.imageUrl) {
-                        tooltipImage.src = hoveredStar.project.imageUrl;
-                        tooltipImage.style.display = 'block';
-                    } else {
-                        tooltipImage.style.display = 'none';
-                    }
-                }
-
-                // Dynamic Tooltip Theming
-                let ttColor = 'rgba(255, 255, 255, 0.2)';
-                let glowColor = 'rgba(0, 0, 0, 0.8)';
-                let catColor = '#b48cff';
-                if (hoveredStar.colorTheme === 0) { ttColor = 'rgba(180, 140, 255, 0.6)'; glowColor = 'rgba(180, 140, 255, 0.2)'; catColor = '#b48cff'; }
-                else if (hoveredStar.colorTheme === 1) { ttColor = 'rgba(0, 255, 255, 0.6)'; glowColor = 'rgba(0, 255, 255, 0.2)'; catColor = '#00ffff'; }
-                else if (hoveredStar.colorTheme === 2) { ttColor = 'rgba(255, 69, 0, 0.6)'; glowColor = 'rgba(255, 69, 0, 0.2)'; catColor = '#ff4500'; }
-
-                const card = tooltip.querySelector('.glass-card');
-                if (card) {
-                    card.style.borderColor = ttColor;
-                    card.style.boxShadow = `0 10px 40px rgba(0,0,0,0.8), 0 0 20px ${glowColor}`;
-                }
-                if (tooltipCategory) {
-                    tooltipCategory.style.color = catColor;
-                    tooltipCategory.style.textShadow = `0 0 8px ${glowColor}`;
-                }
-
-                // When opened from the list, flip the quick view to the star's left so it doesn't cover the list
-                const flipLeft = hoveredStar === listHoverStar && hoveredStar.x + 310 > hoveredStar.listLeft;
-                tooltip.style.transform = flipLeft ? 'translate(calc(-100% - 20px), -20px)' : 'translate(20px, -20px)';
                 setActiveListItem(hoveredStar);
-
-                tooltip.style.opacity = '1';
                 canvas.style.cursor = 'pointer';
             }
-            // Move tooltip smoothly to star
-            tooltip.style.left = hoveredStar.x + 'px';
-            tooltip.style.top = hoveredStar.y + 'px';
         } else {
             if (hoveredStar) {
                 hoveredStar = null;
-                tooltip.style.opacity = '0';
                 canvas.style.cursor = 'crosshair';
                 setActiveListItem(null);
             }
