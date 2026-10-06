@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let numCategories = 1; // Will be updated when data is parsed
 
     // Small constellations: star spread and star size relative to the original full-size ones
-    const starScale = window.innerWidth >= 1000 ? 0.35 : 0.3;
+    const starScale = window.innerWidth >= 1280 ? 0.35 : 0.3;
     const starSize = 0.6;
     const starHitRadius = 30 * starSize;
     const miniR = (260 + 35) * starScale + 5; // Furthest a star reaches from its constellation center
@@ -237,7 +237,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Each section: project list, with a small constellation on its right (above it on narrow screens)
     const sideBySide = window.innerWidth >= 1000;
-    const listWidth = window.innerWidth >= 1280 ? 480 : (sideBySide ? 380 : Math.min(560, window.innerWidth - 32));
+    const constGap = 56; // Space between the list and its constellation
+    // As wide as possible (up to 720px) while leaving room for the constellation on either side
+    const listWidth = sideBySide ? Math.min(720, window.innerWidth - 2 * (constGap + miniR * 2 + 16)) : Math.min(560, window.innerWidth - 32);
     const listThemes = ['180, 140, 255', '0, 255, 255', '255, 69, 0']; // Match star colors
     const sectionLayouts = [];
     let listHoverStar = null;
@@ -469,7 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // side away from the section's background planet/rocket/nebula (right on even sections, see draw())
                 const bandH = Math.max(listH, miniR * 2);
                 const decorOnRight = index % 2 === 0;
-                centerX = decorOnRight ? listLeft - 70 - miniR : listLeft + listWidth + 70 + miniR;
+                centerX = decorOnRight ? listLeft - constGap - miniR : listLeft + listWidth + constGap + miniR;
                 centerY = contentTop + bandH / 2;
                 listTop = contentTop;
             } else {

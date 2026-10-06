@@ -82,18 +82,18 @@
         .constellation-list-inner {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            padding: 1rem;
+            gap: 6px;
+            padding: 1.5rem;
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
+            border-radius: 16px;
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             animation: uiFadeIn 1s ease-out 0.9s both;
         }
         .constellation-list-heading {
-            margin: 0 0 0.4rem 0.7rem;
-            font-size: 0.75rem;
+            margin: 0 0 0.6rem 1rem;
+            font-size: 1.125rem;
             font-weight: 600;
             letter-spacing: 0.08em;
             text-transform: uppercase;
@@ -102,12 +102,12 @@
         .constellation-list-item {
             display: flex;
             align-items: flex-start;
-            gap: 0.7rem;
-            padding: 0.55rem 0.7rem;
+            gap: 1.1rem;
+            padding: 0.8rem 1rem;
             border: 1px solid transparent;
-            border-radius: 8px;
+            border-radius: 10px;
             color: #cbd5e1;
-            font-size: 0.9rem;
+            font-size: 1.35rem;
             font-weight: 500;
             line-height: 1.3;
             text-decoration: none;
@@ -115,10 +115,10 @@
         }
         .constellation-list-thumb {
             flex: none;
-            width: 76px;
-            height: 51px;
+            width: 150px;
+            height: 100px;
             margin-top: 2px;
-            border-radius: 6px;
+            border-radius: 8px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.08);
             background: rgba(255, 255, 255, 0.03);
@@ -136,14 +136,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 3px;
+            gap: 6px;
             color: rgba(148, 163, 184, 0.6);
-            font-size: 0.6rem;
+            font-size: 0.75rem;
             letter-spacing: 0.04em;
             text-transform: uppercase;
         }
         .constellation-list-thumb.is-empty i {
-            font-size: 0.95rem;
+            font-size: 1.5rem;
         }
         .constellation-list-item:hover .constellation-list-thumb,
         .constellation-list-item:focus-visible .constellation-list-thumb,
@@ -159,16 +159,16 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 4px;
             min-width: 0;
         }
         .constellation-list-title {
             display: flex;
             align-items: center;
-            gap: 0.7rem;
+            gap: 1rem;
         }
         .constellation-list-desc {
-            font-size: 0.78rem;
+            font-size: 1.17rem;
             font-weight: 400;
             line-height: 1.45;
             color: var(--text-muted);
@@ -179,7 +179,7 @@
         }
         .constellation-list-title i {
             margin-left: auto;
-            font-size: 0.8rem;
+            font-size: 1.1rem;
             color: rgb(var(--accent-rgb));
             opacity: 0;
             transform: translateX(-4px);
@@ -203,11 +203,23 @@
         .constellation-list-inner.has-active .constellation-list-item:not(.active) {
             opacity: 0.4;
         }
-        @media (min-width: 1000px) and (max-width: 1279px) {
-            .constellation-list-desc { -webkit-line-clamp: 2; }
+        /* Medium laptops */
+        @media (max-width: 1279px) {
+            .constellation-list-inner { padding: 1.25rem; }
+            .constellation-list-heading { font-size: 1rem; }
+            .constellation-list-item { gap: 0.9rem; font-size: 1.15rem; }
+            .constellation-list-thumb { width: 120px; height: 80px; }
+            .constellation-list-desc { font-size: 1rem; }
         }
+        /* Phones and tablets */
         @media (max-width: 999px) {
-            .constellation-list-thumb { width: 60px; height: 40px; }
+            .constellation-list-inner { padding: 1rem; gap: 4px; }
+            .constellation-list-heading { margin: 0 0 0.4rem 0.7rem; font-size: 0.85rem; }
+            .constellation-list-item { gap: 0.8rem; padding: 0.6rem 0.7rem; font-size: 1.05rem; }
+            .constellation-list-thumb { width: 84px; height: 56px; }
+            .constellation-list-thumb.is-empty { font-size: 0.6rem; }
+            .constellation-list-thumb.is-empty i { font-size: 1.1rem; }
+            .constellation-list-desc { font-size: 0.9rem; -webkit-line-clamp: unset; }
         }
     </style>
     <section id="constellation-section" style="position: relative; width: 100vw; min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; background: var(--bg-dark);">
@@ -215,11 +227,11 @@
         <!-- Rebuilt Top Left Control Panel (Absolute coordinates lock it to exact top-left) -->
         <div id="control-panel" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 25px 35px; pointer-events: none; z-index: 10; display: block; animation: uiFadeIn 1s ease-out 0.5s both;">
             
-            <a href="index.html" class="back-button" style="pointer-events: auto; display: inline-flex; margin-bottom: 25px;">
-                <i class="fas fa-arrow-left"></i> Return Home
-            </a>
-            
+            <!-- Return Home sits in the sticky group so it stays in view while scrolling -->
             <div style="position: sticky; top: 25px; display: flex; flex-direction: column; gap: 15px; pointer-events: auto; width: max-content;">
+                <a href="index.html" class="back-button" style="pointer-events: auto; display: inline-flex; align-self: flex-start; margin-bottom: 10px;">
+                    <i class="fas fa-arrow-left"></i> Return Home
+                </a>
                 <button class="nav-btn" onclick="scrollToCategory(0)">AI / ML</button>
                 <button class="nav-btn" onclick="scrollToCategory(1)">Data Analytics</button>
                 <button class="nav-btn" onclick="scrollToCategory(2)">Cloud / Full-Stack</button>
