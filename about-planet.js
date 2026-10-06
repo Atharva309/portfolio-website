@@ -1,22 +1,23 @@
-// About page background planet, kept to simple shapes: a gradient planet with a few clean bands
-// and two soft spots that rotate around it, a gently breathing glow, one ring with a few dots
-// orbiting along it (passing behind and in front of the planet), and a moon that circles it.
-// Scrolling tilts the ring a little and gives the planet a spin.
-document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('planet-container');
-    const canvas = document.getElementById('about-planet-canvas');
-    if (!container || !canvas) return;
+// The planet used on the home, about and resume pages, kept to simple shapes: a gradient planet
+// with a few clean bands and two soft spots that rotate around it, a gently breathing glow, one
+// ring with a few dots orbiting along it (passing behind and in front of the planet), and a moon
+// that circles it. Scrolling tilts the ring a little and gives the planet a spin.
+// It draws into every <canvas data-planet>, sized to the planet's box: the nearest
+// [data-planet-box] ancestor, or else the canvas's parent.
+function initPlanet(canvas) {
+    const container = canvas.closest('[data-planet-box]') || canvas.parentElement;
+    // Ring/band tilt in radians; a planet in the bottom-right corner uses a mirrored tilt (data-planet-tilt)
+    const BASE_TILT = canvas.dataset.planetTilt ? parseFloat(canvas.dataset.planetTilt) : -0.32;
 
     const ctx = canvas.getContext('2d');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const RING_SQUASH = 0.22; // How flat the ring looks (viewing angle)
     const RING_RADIUS = 1.42; // In planet radii
-    const BASE_TILT = -0.32;  // Ring/band tilt in radians
 
     let S, C, R, cx, cy, dpr;
     let view = { x: 0, y: 0, w: 0, h: 0 }; // Part of the canvas currently on screen
-    let halo, body, bandTex, bandW, bandLayer, bandCtx;
+    let halo, body;
     let dots = [];
     let spin = 0;          // Planet rotation (radians of longitude)
     let boost = 0;         // Extra spin from scrolling, decays over time
@@ -62,27 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
         g.beginPath();
         g.arc(cx, cy, R, 0, Math.PI * 2);
         g.fill();
-
-        // Surface: a few clean bands and two soft spots. One full turn is 4R wide, drawn twice so it wraps.
-        bandW = R * 4;
-        [bandTex, g] = offscreen(bandW * 2, R * 2);
-        [[0.5, 0.2, 0.09], [1.0, 0.26, 0.06], [1.48, 0.12, 0.08]].forEach(([y, h, alpha]) => {
-            g.fillStyle = `rgba(200, 180, 255, ${alpha})`;
-            g.fillRect(0, R * y, bandW * 2, R * h);
-        });
-        [[0.3, 0.72, 0.13, 'rgba(210, 190, 255, 0.13)'], [0.72, 1.3, 0.08, 'rgba(20, 10, 40, 0.22)']].forEach(([x, y, r, color]) => {
-            g.fillStyle = color;
-            for (const copy of [-1, 0, 1, 2]) {
-                g.beginPath();
-                g.arc((x + copy) * bandW, R * y, R * r, 0, Math.PI * 2);
-                g.fill();
-            }
-        });
-
-        // Unrotated layer the surface is mapped into each frame (pixel aligned, so slices never overlap)
-        bandLayer = document.createElement('canvas');
-        bandLayer.width = bandLayer.height = Math.ceil(R * 2 * dpr);
-        bandCtx = bandLayer.getContext('2d');
 
         // A few dots orbiting along the ring
         dots = [];
@@ -163,36 +143,40 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fill();
     }
 
-    function drawSurface(tilt) {
-        // Map the surface onto the sphere in thin vertical slices, so the spots squash toward the
-        // edges and appear to rotate around the planet. Slices are snapped to whole pixels in an
-        // unrotated layer so neighbours never overlap, then the layer is tilted into place.
-        const size = bandLayer.width;
-        const half = size / 2;
-        bandCtx.clearRect(0, 0, size, size);
-        const slices = 90;
-        const offset = ((spin / (Math.PI * 2)) * bandW) % bandW;
-        const scale = bandTex.width / (bandW * 2);
-        let prevX = 0;
-        for (let i = 0; i < slices; i++) {
-            const p0 = -Math.PI / 2 + (Math.PI * i) / slices;
-            const p1 = -Math.PI / 2 + (Math.PI * (i + 1)) / slices;
-            const nextX = Math.round(half + Math.sin(p1) * half);
-            if (nextX <= prevX) continue;
-            let u = ((p0 / (Math.PI * 2)) * bandW + offset) % bandW;
-            if (u < 0) u += bandW;
-            const uw = (bandW * (p1 - p0)) / (Math.PI * 2);
-            bandCtx.drawImage(bandTex, u * scale, 0, uw * scale, bandTex.height, prevX, 0, nextX - prevX, size);
-            prevX = nextX;
-        }
+    // Surface: a few clean latitude bands, and two soft spots that turn with the planet
+    const BANDS = [[-0.5, 0.2, 0.09], [0, 0.26, 0.06], [0.48, 0.12, 0.08]]; // [top, height] in radii, alpha
+    const SPOTS = [
+        { lon: 5.3, lat: -0.28, r: 0.13, color: 'rgba(210, 190, 255, 0.13)' }, // Starts in view
+        { lon: 3.4, lat: 0.3, r: 0.08, color: 'rgba(20, 10, 40, 0.22)' }
+    ];
 
+    function drawSurface(tilt) {
         ctx.save();
         ctx.beginPath();
         ctx.arc(cx, cy, R, 0, Math.PI * 2);
         ctx.clip();
         ctx.translate(cx, cy);
         ctx.rotate(tilt);
-        ctx.drawImage(bandLayer, -R * 1.02, -R * 1.02, R * 2.04, R * 2.04);
+
+        for (const [top, h, alpha] of BANDS) {
+            ctx.fillStyle = `rgba(200, 180, 255, ${alpha})`;
+            ctx.fillRect(-R * 1.1, top * R, R * 2.2, h * R);
+        }
+
+        // Each spot sits on the sphere: it moves fastest across the middle, squashes toward the
+        // edge and fades out as it turns away (same direction as the ring dots and the moon)
+        for (const spot of SPOTS) {
+            const lon = spot.lon + spin;
+            const facing = Math.cos(lon);
+            if (facing <= 0) continue;
+            const x = -Math.cos(spot.lat) * Math.sin(lon) * R;
+            const y = Math.sin(spot.lat) * R;
+            ctx.globalAlpha = Math.min(1, facing / 0.3);
+            ctx.fillStyle = spot.color;
+            ctx.beginPath();
+            ctx.ellipse(x, y, spot.r * R * facing, spot.r * R, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
         ctx.restore();
     }
 
@@ -251,4 +235,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setup();
     requestAnimationFrame(frame);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('canvas[data-planet]').forEach(initPlanet);
 });
