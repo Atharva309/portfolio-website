@@ -237,9 +237,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Each section: project list, with a small constellation on its right (above it on narrow screens)
     const sideBySide = window.innerWidth >= 1000;
-    const constGap = 56; // Space between the list and its constellation
-    // As wide as possible (up to 720px) while leaving room for the constellation on either side
-    const listWidth = sideBySide ? Math.min(720, window.innerWidth - 2 * (constGap + miniR * 2 + 16)) : Math.min(560, window.innerWidth - 32);
+    const constGap = 70; // Space between the list and its constellation
+    // Up to 530px, narrower if needed to leave room for the constellation on either side
+    const listWidth = sideBySide ? Math.min(530, window.innerWidth - 2 * (constGap + miniR * 2 + 16)) : Math.min(560, window.innerWidth - 32);
     const listThemes = ['180, 140, 255', '0, 255, 255', '255, 69, 0']; // Match star colors
     const sectionLayouts = [];
     let listHoverStar = null;
