@@ -437,11 +437,10 @@ document.addEventListener('DOMContentLoaded', () => {
             let centerX, centerY, listTop;
 
             if (sideBySide) {
-                // List centered under the title, constellation to its right.
-                // Even sections have their planet/nebula at the top right (see draw()), so sit below it there.
+                // List centered under the title, constellation vertically centered on its right
                 const bandH = Math.max(listH, miniR * 2);
                 centerX = listLeft + listWidth + 70 + miniR;
-                centerY = index % 2 === 0 ? contentTop + bandH - miniR : contentTop + bandH / 2;
+                centerY = contentTop + bandH / 2;
                 listTop = contentTop;
             } else {
                 // Constellation above the list, on its right (clear of the side nav buttons)
