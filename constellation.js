@@ -229,8 +229,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const isMobileLayout = window.innerWidth <= 768;
     const spacingCoef = isMobileLayout ? 1.5 : 1.2;
 
+    // On wide screens, shift each constellation left and list its projects on the right
+    const showProjectList = !isMobileLayout && window.innerWidth >= 1000;
+    const listGap = 320; // Distance from constellation center to the list (star spread + breathing room)
+    const listWidth = 320;
+    const listThemes = ['180, 140, 255', '0, 255, 255', '255, 69, 0']; // Match star/tooltip colors
+    let listHoverStar = null;
+    let activeListItem = null;
+
     categoryNames.forEach((cat, index) => {
-        const centerX = width / 2;
+        const centerX = showProjectList ? (width - (listGap * 2 + listWidth)) / 2 + listGap : width / 2;
         const centerY = (index + spacingCoef) * window.innerHeight; // Pushed further down
         
         // Inject HTML Title for this category
@@ -275,6 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
             section.appendChild(titleEl);
         }
         
+        const catStars = [];
         categories[cat].forEach((project, pIndex) => {
             let placed = false;
             let x, y;
@@ -303,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 attempts++;
             }
             
-            constellations.push({
+            const star = {
                 originalAnchorX: x,
                 originalAnchorY: y,
                 anchorX: x,
@@ -323,9 +332,70 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentRadius: 10,
                 project: project,
                 category: cat
-            });
+            };
+            constellations.push(star);
+            catStars.push(star);
         });
+
+        // Project list beside the constellation; hovering an item opens that star's quick view
+        if (showProjectList && section) {
+            const listLeft = centerX + listGap;
+            const listWrap = document.createElement('div');
+            listWrap.className = 'constellation-list';
+            listWrap.style.top = `${centerY}px`;
+            listWrap.style.left = `${listLeft}px`;
+            listWrap.style.width = `${listWidth}px`;
+            listWrap.style.setProperty('--accent-rgb', listThemes[index % listThemes.length]);
+
+            const inner = document.createElement('div');
+            inner.className = 'constellation-list-inner';
+
+            const heading = document.createElement('p');
+            heading.className = 'constellation-list-heading';
+            heading.textContent = `${catStars.length} project${catStars.length === 1 ? '' : 's'}`;
+            inner.appendChild(heading);
+
+            catStars.forEach(star => {
+                const item = document.createElement('a');
+                item.className = 'constellation-list-item';
+                item.href = projectUrl(star);
+
+                const label = document.createElement('span');
+                label.textContent = star.project.title;
+                item.appendChild(label);
+
+                const arrow = document.createElement('i');
+                arrow.className = 'fas fa-arrow-right';
+                item.appendChild(arrow);
+
+                const show = () => { if (!isWarping) listHoverStar = star; };
+                const hide = () => { if (listHoverStar === star) listHoverStar = null; };
+                item.addEventListener('mouseenter', show);
+                item.addEventListener('focus', show);
+                item.addEventListener('mouseleave', hide);
+                item.addEventListener('blur', hide);
+                item.addEventListener('click', (e) => {
+                    // Let cmd/ctrl/shift-click open the project in a new tab as usual
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                    e.preventDefault();
+                    if (!isWarping) warpToStar(star);
+                });
+
+                star.listItem = item;
+                star.listLeft = listLeft;
+                inner.appendChild(item);
+            });
+
+            listWrap.appendChild(inner);
+            section.appendChild(listWrap);
+        }
     });
+
+    function setActiveListItem(star) {
+        if (activeListItem) activeListItem.classList.remove('active');
+        activeListItem = star && star.listItem ? star.listItem : null;
+        if (activeListItem) activeListItem.classList.add('active');
+    }
 
     // Background stars
     const bgStars = [];
@@ -374,24 +444,33 @@ document.addEventListener('DOMContentLoaded', () => {
         targetParallaxY = 0;
         tooltip.style.opacity = '0';
         canvas.style.cursor = 'crosshair';
+        setActiveListItem(null);
     });
+
+    function projectUrl(star) {
+        let bgType = 'planet';
+        if(star.colorTheme === 1) bgType = 'spaceship';
+        if(star.colorTheme === 2) bgType = 'nebula';
+
+        return `project.html?id=${star.project.id}&theme=${star.colorTheme}&bg=${bgType}`;
+    }
+
+    function warpToStar(star) {
+        isWarping = true;
+        clickedStarRef = star;
+        warpRadius = 0;
+        document.body.style.pointerEvents = 'none'; // disable clicks during warp
+        tooltip.style.opacity = '0';
+
+        const targetUrl = projectUrl(star);
+        setTimeout(() => {
+            window.location.assign(targetUrl);
+        }, 800);
+    }
 
     canvas.addEventListener('click', () => {
         if (hoveredStar && !isWarping) {
-            isWarping = true;
-            clickedStarRef = hoveredStar;
-            warpRadius = 0;
-            document.body.style.pointerEvents = 'none'; // disable clicks during warp
-            tooltip.style.opacity = '0';
-            
-            let bgType = 'planet';
-            if(hoveredStar.colorTheme === 1) bgType = 'spaceship';
-            if(hoveredStar.colorTheme === 2) bgType = 'nebula';
-            
-            const targetUrl = `project.html?id=${hoveredStar.project.id}&theme=${hoveredStar.colorTheme}&bg=${bgType}`;
-            setTimeout(() => {
-                window.location.assign(targetUrl);
-            }, 800);
+            warpToStar(hoveredStar);
         }
     });
 
@@ -467,13 +546,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const dy = mouseY - star.y;
             const dist = Math.sqrt(dx*dx + dy*dy);
             
-            if (dist < 30) {
+            if (dist < 30 || star === listHoverStar) {
                 currentHover = star;
                 star.currentRadius = star.baseRadius * 1.5;
             } else {
                 star.currentRadius = star.baseRadius;
             }
         });
+
+        if (listHoverStar) currentHover = listHoverStar;
 
         // Draw connecting lines for same categories
         ctx.lineWidth = 2;
@@ -621,6 +702,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     tooltipCategory.style.textShadow = `0 0 8px ${glowColor}`;
                 }
 
+                // When opened from the list, flip the quick view to the star's left so it doesn't cover the list
+                const flipLeft = hoveredStar === listHoverStar && hoveredStar.x + 310 > hoveredStar.listLeft;
+                tooltip.style.transform = flipLeft ? 'translate(calc(-100% - 20px), -20px)' : 'translate(20px, -20px)';
+                setActiveListItem(hoveredStar);
+
                 tooltip.style.opacity = '1';
                 canvas.style.cursor = 'pointer';
             }
@@ -632,6 +718,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 hoveredStar = null;
                 tooltip.style.opacity = '0';
                 canvas.style.cursor = 'crosshair';
+                setActiveListItem(null);
             }
         }
 
